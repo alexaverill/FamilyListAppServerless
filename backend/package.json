@@ -11,5 +11,8 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "aws-lambda": "^1.0.7"
   }
 }
