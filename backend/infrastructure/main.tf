@@ -8,6 +8,17 @@ terraform {
 
   required_version = ">= 1.2.0"
 }
+data "archive_file" "create_list_lambda_layer_zip"{
+    type="zip"
+    source_dir = "../${path.module}/src/layers/dist"
+    output_path = "${path.module}/layer.zip"
+}
+resource "aws_lambda_layer_version" "create_list_lambda_layer" {
+  filename   = data.archive_file.create_list_lambda_layer_zip.output_path
+  layer_name = "create-list-lambda-layer"
+
+  compatible_runtimes = ["nodejs18.x"]
+}
 data "archive_file" "lambda_create_list" {
   type = "zip"
 
@@ -62,6 +73,10 @@ resource "aws_lambda_function" "create_list" {
   source_code_hash = data.archive_file.lambda_create_list.output_base64sha256
 
   role = aws_iam_role.lambda_exec.arn
+  layers = [aws_lambda_layer_version.create_list_lambda_layer.arn]
+    depends_on = [
+    data.archive_file.create_list_lambda_layer_zip
+  ]
 }
 resource "aws_lambda_function" "get_lists" {
   function_name = "GetLists"
@@ -244,7 +259,7 @@ resource "aws_apigatewayv2_integration" "get_lists_integration" {
 resource "aws_apigatewayv2_route" "get_lists_route" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
-  route_key = "GET /get-lists"
+  route_key = "GET /get-lists/{eventId}"
   target    = "integrations/${aws_apigatewayv2_integration.get_lists_integration.id}"
 }
 

@@ -5,8 +5,9 @@
       "noImplicitAny": true,
       "preserveConstEnums": true,
       "outDir": "./dist",
-      "sourceMap": true,
-      "composite": true, // needed for references sub-projects
-      "rootDir": ".",
+      "baseUrl": ".",
+      "paths": {
+        "@Layers/List": ["../layers/*"]
+      }
     }
   }

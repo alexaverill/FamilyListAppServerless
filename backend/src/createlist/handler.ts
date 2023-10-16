@@ -1,13 +1,15 @@
 import { Handler } from 'aws-lambda';
-import { List } from './List';
-import { ListItem } from './ListItem';
+import {List} from "@Layers/List"
 // ES6+ example
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 const client = new DynamoDBClient({ region: "us-west-2" });
 const docClient = DynamoDBDocumentClient.from(client);
-export const handler: Handler = async (event, context) => {
+const handler: Handler = async (event, context) => {
     let list = JSON.parse(event.body);
+    var listList = new List();
+    listList.eventBid = "1";
+    console.log(list);
     try {
         const command = new PutCommand({
             TableName: "Lists",
@@ -18,6 +20,7 @@ export const handler: Handler = async (event, context) => {
           console.log(response);
       } catch (error) {
         console.log(error);
+        //throw error
       } 
     console.log('EVENT: \n' + JSON.stringify(event, null, 2));
     console.log(list);
@@ -29,19 +32,4 @@ export const handler: Handler = async (event, context) => {
         })
       }
 };
-//List stucture
-// {
-//     eventBid:12345
-//     userId:12
-//     items:[
-//         {
-//             name: "",
-//             url:"",
-//             price: 1.1,
-//             isClaimed: false,
-//             claimedBy: 123,
-//             quantity: 1,
-//             comments: ""
-//         }
-//     ]
-// }
+export default handler;

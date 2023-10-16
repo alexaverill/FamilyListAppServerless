@@ -4,10 +4,7 @@
       "target": "ES2017",
       "noImplicitAny": true,
       "preserveConstEnums": true,
-      "outDir": "./dist",
-      "sourceMap": true,
-      "paths": {
-        "/opt/nodejs/*": ["../layers/*"]
-      }
+      "outDir": "./dist/nodejs/",
+      "sourceMap": false
     }
   }
