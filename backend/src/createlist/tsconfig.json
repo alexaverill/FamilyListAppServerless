@@ -7,7 +7,7 @@
       "outDir": "./dist",
       "baseUrl": ".",
       "paths": {
-        "@Layers/List": ["../layers/*"]
+        "@Layers/*": ["../layers/*"]
       }
     }
   }
