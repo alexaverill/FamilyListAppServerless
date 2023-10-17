@@ -3,10 +3,11 @@ import {DynamoDBDocumentClient, PutCommand} from '@aws-sdk/lib-dynamodb';
 import {mockClient} from 'aws-sdk-client-mock';
 import {handler} from './handler';
 describe('Basic Test',()=>{
+    const dynamoDB = new DynamoDBClient({});
+    const dynamoDBMock = mockClient(DynamoDBDocumentClient);
+    
     beforeEach(()=>{
-        const dynamoDB = new DynamoDBClient({});
-        const dynamoDBMock = mockClient(DynamoDBDocumentClient);
-        dynamoDBMock.on(PutCommand).resolves({});
+        dynamoDBMock.reset()
     });
     let sampleList = {
         "listId":"1",
@@ -21,6 +22,7 @@ describe('Basic Test',()=>{
         }]
     };
     it("returns 200 with a valid payload",async ()=>{
+        dynamoDBMock.on(PutCommand).resolves({});
         var event = {
             body:JSON.stringify(sampleList)
         }
@@ -63,4 +65,12 @@ describe('Basic Test',()=>{
         expect(result.statusCode).toBe(400);
         expect(result.body).toBe("Invalid list provided");
     });
+    it('handles dynamoDb Error',async ()=>{
+        dynamoDBMock.on(PutCommand).rejects('Validation Error');
+        var event = {
+            body:JSON.stringify(sampleList)
+        }
+        var result = await handler(event,null,null);
+        expect(result.statusCode).toBe(500);
+    })
 })
