@@ -1,11 +1,11 @@
 import { Handler } from 'aws-lambda';
-import {List} from "@Layers/List"
+import {List} from "/opt/nodejs/List"
 // ES6+ example
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 const client = new DynamoDBClient({ region: "us-west-2" });
 const docClient = DynamoDBDocumentClient.from(client);
-const handler: Handler = async (event, context) => {
+export const handler: Handler = async (event, context) => {
     let list = JSON.parse(event.body);
     var listList = new List();
     listList.eventBid = "1";
@@ -32,4 +32,3 @@ const handler: Handler = async (event, context) => {
         })
       }
 };
-export default handler;

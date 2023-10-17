@@ -195,7 +195,7 @@ const config: Config = {
   // Whether to use watchman for file crawling
   // watchman: true,
   moduleNameMapper: {
-    '^@Layers/(.*)$': '../layers/$1',
+    '^/opt/nodejs/(.*)$': '../layers/$1',
   },
 };
 

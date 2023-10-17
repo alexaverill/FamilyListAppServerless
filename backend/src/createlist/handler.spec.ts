@@ -1,6 +1,6 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {mockClient} from 'aws-sdk-client-mock';
-import handler from './handler';
+import {handler} from './handler';
 describe('Basic Test',()=>{
     beforeEach(()=>{
         const dynamoDB = new DynamoDBClient({});
