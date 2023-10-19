@@ -17,6 +17,7 @@ export const handler: Handler = async (event, context) => {
     });
     
       const response = await docClient.send(command);
+      console.log(response);
       const items = response.Items.map( (item) => {
         return unmarshall(item);
     });
