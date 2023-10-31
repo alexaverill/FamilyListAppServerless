@@ -12,14 +12,7 @@ describe('Basic Test',()=>{
     let sampleList = {
         "listId":"1",
         "eventId":"2",
-        "userId":"12",
-        "items":[{
-            "name":"A",
-            "url":"http:/google.com",
-            "price":12.24,
-            "isClaimed":false,
-            "comments":"This is a gift"
-        }]
+        "userId":"12"
     };
     it("returns 200 with a valid payload",async ()=>{
         dynamoDBMock.on(PutCommand).resolves({});

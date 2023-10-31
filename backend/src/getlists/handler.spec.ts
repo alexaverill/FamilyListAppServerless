@@ -9,10 +9,10 @@ describe('Get Lists Test',()=>{
         dynamoDBMock.reset()
     });
     it('Returns 200 when called',async ()=>{
-        // dynamoDBMock.on(QueryCommand).resolves({
-        //     Items:[{listId:'1'}]
-        // });
-        dynamoDBMock.on(QueryCommand).rejects("Error");
+        dynamoDBMock.on(QueryCommand).resolves({
+            Items:[{listId:'1'}]
+        });
+        //dynamoDBMock.on(QueryCommand).rejects("Error");
         var event = {
             pathParameters:{eventId:1}
         }
