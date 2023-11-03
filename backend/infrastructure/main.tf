@@ -174,7 +174,7 @@ resource "aws_apigatewayv2_route" "create_list_route" {
 resource "aws_apigatewayv2_integration" "get_lists_integration" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
-  integration_uri    = module.create_list_lambda.lambda_arn
+  integration_uri    = module.get_list_lambda.lambda_arn
   integration_type   = "AWS_PROXY"
   integration_method = "POST"
 }
