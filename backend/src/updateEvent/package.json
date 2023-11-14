@@ -2,10 +2,10 @@
   "name": "getlists",
   "version": "1.0.0",
   "description": "",
-  "main": "updateList,js",
+  "main": "updateEvent,js",
   "scripts": {
     "test": "jest",
-    "build": "tsc --project tsconfig.build.json; cp ./dist/updateList/* ./dist; rm -r ./dist/updateList;"
+    "build": "tsc --project tsconfig.build.json; cp ./dist/updateEvent/* ./dist; rm -r ./dist/updateEvent;"
   },
   "author": "",
   "license": "ISC",
