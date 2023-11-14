@@ -21,7 +21,9 @@ variable "output_path" {
 variable "lambda_layer_arn"{
   type = string
 }
-
+variable "handler_path" {
+  type = string
+}
 data "archive_file" "lambda_zip" {
 
   type = "zip"
@@ -52,7 +54,7 @@ resource "aws_lambda_function" "lambda_function" {
   s3_key    = aws_s3_object.lambda-s3_object.key
 
   runtime = "nodejs18.x"
-  handler = "handler.handler"
+  handler = "${var.handler_path}"
 
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 

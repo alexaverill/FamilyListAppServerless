@@ -1,4 +1,5 @@
 export class ListItem{
+    public itemId:String;
     public name:String;
     public url:String;
     public price:Number;

@@ -4,19 +4,24 @@ import {List} from "/opt/nodejs/List"
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { ListItem } from '../layers/ListItem';
+import { randomUUID } from "crypto";
 const client = new DynamoDBClient({ region: "us-west-2" });
 const docClient = DynamoDBDocumentClient.from(client);
 export const handler: Handler = async (event, context) => {
     let listItem:ListItem = JSON.parse(event.body);
-    if(!validateIsListItme(listItem)){
+    if(!validateIsListItem(listItem)){
       return {
         statusCode:400,
         body:"Invalid list provided"
       }
     }
+    if(!listItem.itemId){
+      listItem.itemId = randomUUID();
+    }
+    console.log(listItem);
     try {
         const command = new PutCommand({
-            TableName: "ListItem",
+            TableName: "ListItems",
             Item: listItem
           });
         
@@ -40,6 +45,6 @@ export const handler: Handler = async (event, context) => {
       }
 };
 
-const validateIsListItme = (item:any)=>{
+const validateIsListItem = (item:any)=>{
   return item.listId;
 }

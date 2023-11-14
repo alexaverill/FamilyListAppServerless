@@ -15,6 +15,7 @@ module "create_list_lambda" {
   output_path = "${path.module}/createllist.zip"
   lambda_name = "create-list"
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "handler.handler"
 }
 module "get_list_lambda" {
   source = "./lambda_module"
@@ -22,6 +23,7 @@ module "get_list_lambda" {
   output_path = "${path.module}/getlists.zip"
   lambda_name = "get-lists"
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "handler.handler"
 }
 
 module "create_items" {
@@ -30,6 +32,7 @@ module "create_items" {
   output_path = "${path.module}/createItems.zip"
   lambda_name = "create-items"
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "createItems.handler"
 }
 
 #Dynamo setup
@@ -80,7 +83,7 @@ resource "aws_dynamodb_table" "lists-dynamodb-table" {
   }
 }
 resource "aws_dynamodb_table" "items-dynamodb-table" {
-  name           = "items"
+  name           = "ListItems"
   billing_mode   = "PROVISIONED"
   read_capacity  = 20
   write_capacity = 20
@@ -89,7 +92,7 @@ resource "aws_dynamodb_table" "items-dynamodb-table" {
 
   attribute {
     name = "itemId"
-    type = "S"
+    type = "N"
   }
   attribute {
     name = "listId"
@@ -105,7 +108,6 @@ resource "aws_dynamodb_table" "items-dynamodb-table" {
     write_capacity     = 10
     read_capacity      = 10
     projection_type    = "ALL"
-    #non_key_attributes = ["UserId"]
   }
   tags = {
     Name        = "listapp-item-table"
@@ -184,7 +186,19 @@ resource "aws_apigatewayv2_route" "get_lists_route" {
   route_key = "GET /get-lists/{eventId}"
   target    = "integrations/${aws_apigatewayv2_integration.get_lists_integration.id}"
 }
+resource "aws_apigatewayv2_integration" "creat_items_integration" {
+  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
+  integration_uri    = module.create_items.lambda_arn
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+}
+resource "aws_apigatewayv2_route" "create_items_route" {
+  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
+
+  route_key = "POST /create-items"
+  target    = "integrations/${aws_apigatewayv2_integration.creat_items_integration.id}"
+}
 resource "aws_cloudwatch_log_group" "api_gw" {
   name = "/aws/api_gw/${aws_apigatewayv2_api.familylistapp_gateway.name}"
 
@@ -203,6 +217,14 @@ resource "aws_lambda_permission" "api_gw_get" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = module.get_list_lambda.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
+}
+resource "aws_lambda_permission" "api_gw_create_list" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = module.create_items.lambda_function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
