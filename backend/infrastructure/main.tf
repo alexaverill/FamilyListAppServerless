@@ -257,7 +257,7 @@ resource "aws_apigatewayv2_integration" "get_events_integration" {
   integration_type   = "AWS_PROXY"
   integration_method = "POST"
 }
-resource "aws_apigatewayv2_route" "get_event_route" {
+resource "aws_apigatewayv2_route" "get_events_route" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
   route_key = "POST /create-items"
