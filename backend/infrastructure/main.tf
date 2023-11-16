@@ -209,7 +209,7 @@ resource "aws_apigatewayv2_route" "get_lists_route" {
   route_key = "GET /get-lists/{eventId}"
   target    = "integrations/${aws_apigatewayv2_integration.get_lists_integration.id}"
 }
-resource "aws_apigatewayv2_integration" "creat_items_integration" {
+resource "aws_apigatewayv2_integration" "create_items_integration" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
   integration_uri    = module.create_items.lambda_arn
@@ -220,8 +220,50 @@ resource "aws_apigatewayv2_route" "create_items_route" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
   route_key = "POST /create-items"
-  target    = "integrations/${aws_apigatewayv2_integration.creat_items_integration.id}"
+  target    = "integrations/${aws_apigatewayv2_integration.create_items_integration.id}"
 }
+
+resource "aws_apigatewayv2_integration" "create_event_integration" {
+  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
+
+  integration_uri    = module.create_event.lambda_arn
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+}
+resource "aws_apigatewayv2_route" "create_event_route" {
+  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
+  route_key = "POST /create-event"
+  target    = "integrations/${aws_apigatewayv2_integration.create_event_integration.id}"
+}
+
+resource "aws_apigatewayv2_integration" "get_event_integration" {
+  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
+
+  integration_uri    = module.get_event.lambda_arn
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+}
+resource "aws_apigatewayv2_route" "get_event_route" {
+  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
+
+  route_key = "POST /create-items"
+  target    = "integrations/${aws_apigatewayv2_integration.get_event_integration.id}"
+}
+
+resource "aws_apigatewayv2_integration" "get_events_integration" {
+  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
+
+  integration_uri    = module.get_events.lambda_arn
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+}
+resource "aws_apigatewayv2_route" "get_event_route" {
+  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
+
+  route_key = "POST /create-items"
+  target    = "integrations/${aws_apigatewayv2_integration.get_events_integration.id}"
+}
+
 resource "aws_cloudwatch_log_group" "api_gw" {
   name = "/aws/api_gw/${aws_apigatewayv2_api.familylistapp_gateway.name}"
 
@@ -248,6 +290,31 @@ resource "aws_lambda_permission" "api_gw_create_list" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = module.create_items.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "api_gw_create_event" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = module.create_event.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
+}
+resource "aws_lambda_permission" "api_gw_get_event" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = module.get_event.lambda_function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
+}
+resource "aws_lambda_permission" "api_gw_get_events" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = module.get_events.lambda_function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
