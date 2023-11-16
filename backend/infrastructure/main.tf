@@ -34,7 +34,14 @@ module "create_items" {
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
   handler_path = "createItems.handler"
 }
-
+module "create_event" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/createEvent/dist"
+  output_path = "${path.module}/createEvent.zip"
+  lambda_name = "create-event"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "createEvent.handler"
+}
 #Dynamo setup
 resource "aws_dynamodb_table" "lists-dynamodb-table" {
   name           = "Lists"
@@ -115,7 +122,7 @@ resource "aws_dynamodb_table" "items-dynamodb-table" {
   }
 }
 resource "aws_dynamodb_table" "events-dynamodb-table" {
-  name           = "events"
+  name           = "Events"
   billing_mode   = "PROVISIONED"
   read_capacity  = 20
   write_capacity = 20
