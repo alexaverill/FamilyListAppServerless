@@ -246,7 +246,7 @@ resource "aws_apigatewayv2_integration" "get_event_integration" {
 resource "aws_apigatewayv2_route" "get_event_route" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
-  route_key = "POST /create-items"
+  route_key = "POST /get-event"
   target    = "integrations/${aws_apigatewayv2_integration.get_event_integration.id}"
 }
 
@@ -260,7 +260,7 @@ resource "aws_apigatewayv2_integration" "get_events_integration" {
 resource "aws_apigatewayv2_route" "get_events_route" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
-  route_key = "POST /create-items"
+  route_key = "POST /get-events"
   target    = "integrations/${aws_apigatewayv2_integration.get_events_integration.id}"
 }
 
