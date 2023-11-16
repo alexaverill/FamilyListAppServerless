@@ -42,6 +42,22 @@ module "create_event" {
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
   handler_path = "createEvent.handler"
 }
+module "get_event" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/getEvent/dist"
+  output_path = "${path.module}/getEvent.zip"
+  lambda_name = "get-event"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "getEvent.handler"
+}
+module "get_events" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/getEvents/dist"
+  output_path = "${path.module}/getEvents.zip"
+  lambda_name = "get-events"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "getEvents.handler"
+}
 #Dynamo setup
 resource "aws_dynamodb_table" "lists-dynamodb-table" {
   name           = "Lists"
