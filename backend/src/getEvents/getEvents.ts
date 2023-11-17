@@ -9,7 +9,7 @@ export const handler: Handler = async (event, context) => {
     console.log(event);
     const command =new ScanCommand({
         TableName:"Events",
-        IndexName:"eventId",
+        IndexName:"eventIdIndex",
     });
     //TODO filter by date/Active
     

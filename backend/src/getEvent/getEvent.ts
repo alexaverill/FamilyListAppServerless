@@ -9,8 +9,8 @@ export const handler: Handler = async (event, context) => {
     console.log(event);
     const command =new QueryCommand({
         TableName:"Events",
-        IndexName:"id",
-        KeyConditionExpression:"id=:e",
+        IndexName:"eventIdIndex",
+        KeyConditionExpression:"eventId=:e",
         ExpressionAttributeValues: {
             ':e': {S:`${event.pathParameters.eventId.toString()}`}
            }

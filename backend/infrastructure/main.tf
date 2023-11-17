@@ -143,10 +143,21 @@ resource "aws_dynamodb_table" "events-dynamodb-table" {
   read_capacity  = 20
   write_capacity = 20
   hash_key       = "eventId"
-
+  range_key      = "name"
   attribute {
     name = "eventId"
     type = "S"
+  }
+  attribute {
+    name="name"
+    type = "S"
+  }
+  global_secondary_index {
+    name = "eventIdIndex"
+    hash_key = "eventId"
+    write_capacity = 10 
+    read_capacity = 10
+    projection_type = "ALL"
   }
   tags = {
     Name        = "listapp-event-table"
@@ -246,7 +257,7 @@ resource "aws_apigatewayv2_integration" "get_event_integration" {
 resource "aws_apigatewayv2_route" "get_event_route" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
-  route_key = "POST /get-event"
+  route_key = "GET /get-event/{eventId}"
   target    = "integrations/${aws_apigatewayv2_integration.get_event_integration.id}"
 }
 
@@ -260,7 +271,7 @@ resource "aws_apigatewayv2_integration" "get_events_integration" {
 resource "aws_apigatewayv2_route" "get_events_route" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id
 
-  route_key = "POST /get-events"
+  route_key = "GET /get-events"
   target    = "integrations/${aws_apigatewayv2_integration.get_events_integration.id}"
 }
 
