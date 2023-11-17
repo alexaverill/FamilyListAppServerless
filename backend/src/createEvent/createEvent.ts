@@ -17,6 +17,7 @@ export const handler: Handler = async (event, context) => {
     try {
         const command = new PutCommand({
             TableName: "Events",
+            ConditionExpression: "attribute_not_exists(eventId)",
             Item: parsedEvent
           });
         
@@ -41,5 +42,5 @@ export const handler: Handler = async (event, context) => {
 };
 
 const validateIsEvent = (item:any)=>{
-  return item.id && item.date && item.name; 
+  return item.eventId && item.date && item.name; 
 }

@@ -11,7 +11,7 @@ describe('Basic Test',()=>{
         dynamoDBMock.reset()
     });
     let sampleEvent = {
-        "id":"1",
+        "eventId":"1",
         "name":"2",
         "date":Date.now(),
         "givers":"",
@@ -48,7 +48,7 @@ describe('Basic Test',()=>{
     });
     it('returns 400 when missing name',async ()=>{
         let event = {
-            "id":"2",
+            "eventId":"2",
             "date":Date.now(),
             "givers":"",
             "recievers":""
@@ -60,7 +60,7 @@ describe('Basic Test',()=>{
     });
     it('returns 400 when missing date',async ()=>{
         let event = {
-            "id":"2",
+            "eventId":"2",
             "name":"name",
             "givers":"",
             "recievers":""
