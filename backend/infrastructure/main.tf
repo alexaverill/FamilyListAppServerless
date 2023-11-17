@@ -81,7 +81,11 @@ resource "aws_dynamodb_table" "lists-dynamodb-table" {
     type = "S"
   }
 
-
+  global_secondary_index {
+    name="listIdIndex"
+    hash_key = "listId"
+    projection_type = "ALL"
+  }
   global_secondary_index {
     name               = "UserIdIndex"
     hash_key           = "userId"

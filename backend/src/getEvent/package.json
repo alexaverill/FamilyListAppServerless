@@ -12,7 +12,8 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.423.0",
     "@aws-sdk/lib-dynamodb": "^3.423.0",
-    "@aws-sdk/util-dynamodb": "^3.423.0"
+    "@aws-sdk/util-dynamodb": "^3.423.0",
+    "aws-sdk-client-mock-jest": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.2",

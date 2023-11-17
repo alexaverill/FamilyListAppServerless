@@ -7,6 +7,13 @@ const client = new DynamoDBClient({ region: "us-west-2" });
 const docClient = DynamoDBDocumentClient.from(client);
 export const handler: Handler = async (event, context) => {
     console.log(event);
+    if(!validateRequest(event)){
+      return{
+        statusCode:400,
+        body:"eventID is required in the path"
+      }
+    }
+    try{
     const command =new QueryCommand({
         TableName:"Events",
         IndexName:"eventIdIndex",
@@ -25,4 +32,15 @@ export const handler: Handler = async (event, context) => {
         statusCode: 200,
         body: JSON.stringify(items)
       }
+    }catch(exception){
+      console.log(exception);
+      //throw error
+      return {
+        statusCode:500,
+        body:JSON.stringify(exception)
+      };
+    }
 };
+const validateRequest = (request:any )=>{
+  return request.pathParameters?.eventId;
+}
