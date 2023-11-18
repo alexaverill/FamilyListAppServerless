@@ -5,9 +5,94 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f8fff2;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+.navbar{
+  background-color: #00647c;
+  color:white;
+}
+.navbar-brand{
+  color:white;
+}
+.listRow {
+    background-color: white;
+    padding: 0.75%;
+    border-width: 2px;
+    border: 1px solid #5a9ba9;
+    margin-bottom: 1%;
+  border-radius: 11px;
+  -webkit-box-shadow: 0px 0px 3px 0px rgba(90,155,169,1);
+  -moz-box-shadow: 0px 0px 3px 0px rgba(90,155,169,1);
+  box-shadow: 0px 0px 3px 0px rgba(90,155,169,1);
+}
+.claimBtn{
+  width:100%
+}
+.col{
+  align-items: center;
+  display: flex;
+}
+.innerContent{
+    margin-top: 4%;
+    padding: 2%;
+    min-height: 80vh;
+    border-radius: 2%;
+  
+}
+.listHeader{
+  display:grid;
+  grid-template-columns: 10% auto;
+}
+.homeHeader,.header{
+  display:flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-bottom:3%;
+}
+.header-column{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3%;
+}
+.header-date{
+  font-weight: bold;
+}
+.table-header{
+  margin-bottom: 1%;
+  font-weight: bold;
+}
+.list-edit{
+  margin-top:2%;
+  margin-bottom:2%;
+}
+.form-group-right-spacing{
+  margin-right: 8%;
+}
+.header-btn{
+  margin-top:3%;
+}
+.centered{
+  justify-content: center;
+}
+.card{
+  margin:3%;
+}
+.navbar-light .navbar-brand{
+    color: white;
+    font-family: 'Permanent Marker', cursive;
+  
+}
+.navbar-light .navbar-nav .nav-link {
+  color:white;
+}
+a.navbar-brand:hover{
+  color: #dbe0e0;
+
+
 }
