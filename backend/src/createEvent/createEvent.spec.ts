@@ -34,18 +34,6 @@ describe('Basic Test',()=>{
         expect(result.statusCode).toBe(400);
         expect(result.body).toBe(validationErrorText);
     });
-    it('returns 400 when missing event id',async ()=>{
-        let event = {
-            "name":"2",
-            "date":Date.now(),
-            "givers":"",
-            "recievers":""
-        };
-        let payload = {body:JSON.stringify(event)};
-        var result = await handler(payload,null,null);
-        expect(result.statusCode).toBe(400);
-        expect(result.body).toBe(validationErrorText);
-    });
     it('returns 400 when missing name',async ()=>{
         let event = {
             "eventId":"2",

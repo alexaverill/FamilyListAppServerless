@@ -63,7 +63,7 @@ resource "aws_dynamodb_table" "lists-dynamodb-table" {
   name           = "Lists"
   billing_mode   = "PROVISIONED"
   read_capacity  = 20
-  write_capacity = 20
+  write_capacity = 21
   hash_key       = "listId"
   range_key      = "eventId"
 
@@ -85,6 +85,8 @@ resource "aws_dynamodb_table" "lists-dynamodb-table" {
     name="listIdIndex"
     hash_key = "listId"
     projection_type = "ALL"
+    write_capacity     = 10
+    read_capacity      = 10
   }
   global_secondary_index {
     name               = "UserIdIndex"
@@ -172,6 +174,12 @@ resource "aws_dynamodb_table" "events-dynamodb-table" {
 resource "aws_apigatewayv2_api" "familylistapp_gateway" {
   name          = "FamiyListAppsGateway"
   protocol_type = "HTTP"
+    cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["POST", "GET", "OPTIONS"]
+    allow_headers = ["content-type"]
+    max_age = 300
+  }
 }
 resource "aws_apigatewayv2_stage" "familylistapp_gateway_stage" {
   api_id = aws_apigatewayv2_api.familylistapp_gateway.id

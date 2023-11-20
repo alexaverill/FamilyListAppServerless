@@ -1,5 +1,5 @@
 export class Event{
-    id:string;
+    eventId:string;
     date:Date;
     name:string;
     givers:string[];

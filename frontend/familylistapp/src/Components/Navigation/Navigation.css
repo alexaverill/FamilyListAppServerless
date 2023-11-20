@@ -1,0 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Staatliches&display=swap");
+.navbar{
+    background-color: #00647c;
+    color:white;
+  }
+  .navbar-brand{
+    color:white;
+  }
+  .navbar-light .navbar-brand{
+    color: white;
+    font-family: 'Staatliches', cursive;
+    font-weight:900;
+    font-size: x-large;
+  
+}
+  .navbar-light .navbar-nav .nav-link {
+    color:white;
+  }
+  a.navbar-brand:hover{
+    color: #dbe0e0;
+  
+  
+  }

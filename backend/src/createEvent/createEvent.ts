@@ -1,17 +1,21 @@
 import { Handler } from 'aws-lambda';
 import {Event} from "/opt/nodejs/Event"
-// ES6+ example
+import { randomUUID } from 'crypto';
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { PutCommand, DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 const client = new DynamoDBClient({ region: "us-west-2" });
 const docClient = DynamoDBDocumentClient.from(client);
+
 export const handler: Handler = async (event, context) => {
     let parsedEvent:Event = JSON.parse(event.body);
     if(!validateIsEvent(parsedEvent)){
       return {
         statusCode:400,
-        body:"Invalid Event provided, a name, date and id are required"
+        body:"Invalid Event provided, a name, date are required"
       }
+    }
+    if(!parsedEvent.eventId){
+      parsedEvent.eventId = randomUUID();
     }
     console.log(parsedEvent);
     try {
@@ -42,5 +46,5 @@ export const handler: Handler = async (event, context) => {
 };
 
 const validateIsEvent = (item:any)=>{
-  return item.eventId && item.date && item.name; 
+  return item.date && item.name; 
 }
