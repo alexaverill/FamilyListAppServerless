@@ -8,7 +8,15 @@ terraform {
 
   required_version = ">= 1.2.0"
 }
+variable "region" {
+  type = string
+  default = "us-west-2"
+}
+data "aws_caller_identity" "current" {}
 
+locals {
+    account_id = data.aws_caller_identity.current.account_id
+}
 module "create_list_lambda" {
   source = "./lambda_module"
   source_path = "../${path.module}/src/createlist/dist"
@@ -17,7 +25,7 @@ module "create_list_lambda" {
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
   handler_path = "handler.handler"
 }
-module "get_list_lambda" {
+module "get_lists_lambda" {
   source = "./lambda_module"
   source_path =  "../${path.module}/src/getlists/dist"
   output_path = "${path.module}/getlists.zip"
@@ -170,175 +178,122 @@ resource "aws_dynamodb_table" "events-dynamodb-table" {
 
   }
 }
+#cognito
+
+resource "aws_cognito_user_pool" "pool" {
+  name = "family_list_app_pool"
+}
+
+resource "aws_cognito_user_pool_client" "client" {
+  name = "family_list_app_client"
+
+  user_pool_id = "${aws_cognito_user_pool.pool.id}"
+  explicit_auth_flows = ["USER_PASSWORD_AUTH"]
+}
 #api gateway
-resource "aws_apigatewayv2_api" "familylistapp_gateway" {
+resource "aws_api_gateway_rest_api" "familylistapp_gateway" {
   name          = "FamiyListAppsGateway"
-  protocol_type = "HTTP"
-    cors_configuration {
-    allow_origins = ["*"]
-    allow_methods = ["POST", "GET", "OPTIONS"]
-    allow_headers = ["content-type"]
-    max_age = 300
+}
+
+resource "aws_api_gateway_authorizer" "auth" {
+  name          = "CognitoUserPoolAuthorizer"
+  type          = "COGNITO_USER_POOLS"
+  rest_api_id   = aws_api_gateway_rest_api.familylistapp_gateway.id
+  provider_arns = ["${aws_cognito_user_pool.pool.arn}"]
+}
+resource "aws_api_gateway_deployment" "api_deployment" {
+  rest_api_id = aws_api_gateway_rest_api.familylistapp_gateway.id
+  lifecycle {
+    create_before_destroy = true
   }
+  depends_on = [  
+    module.get_lists_api,
+    module.create_items_api,
+    module.create_list_api,
+    module.create_events_api,
+     ]
 }
-resource "aws_apigatewayv2_stage" "familylistapp_gateway_stage" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  name        = "familylistapp_gateway_stage"
-  auto_deploy = true
-
-  access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.api_gw.arn
-
-    format = jsonencode({
-      requestId               = "$context.requestId"
-      sourceIp                = "$context.identity.sourceIp"
-      requestTime             = "$context.requestTime"
-      protocol                = "$context.protocol"
-      httpMethod              = "$context.httpMethod"
-      resourcePath            = "$context.resourcePath"
-      routeKey                = "$context.routeKey"
-      status                  = "$context.status"
-      responseLength          = "$context.responseLength"
-      integrationErrorMessage = "$context.integrationErrorMessage"
-      }
-    )
-  }
+resource "aws_api_gateway_stage" "dev" {
+  deployment_id = aws_api_gateway_deployment.api_deployment.id
+  rest_api_id   = aws_api_gateway_rest_api.familylistapp_gateway.id
+  stage_name    = "dev"
 }
 
-resource "aws_apigatewayv2_integration" "create_list_integration" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  integration_uri    = module.create_list_lambda.lambda_arn
-  integration_type   = "AWS_PROXY"
-  integration_method = "POST"
-}
-resource "aws_apigatewayv2_route" "create_list_route" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  route_key = "POST /create-list"
-  target    = "integrations/${aws_apigatewayv2_integration.create_list_integration.id}"
-}
-resource "aws_apigatewayv2_integration" "get_lists_integration" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  integration_uri    = module.get_list_lambda.lambda_arn
-  integration_type   = "AWS_PROXY"
-  integration_method = "POST"
-}
-resource "aws_apigatewayv2_route" "get_lists_route" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  route_key = "GET /get-lists/{eventId}"
-  target    = "integrations/${aws_apigatewayv2_integration.get_lists_integration.id}"
-}
-resource "aws_apigatewayv2_integration" "create_items_integration" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  integration_uri    = module.create_items.lambda_arn
-  integration_type   = "AWS_PROXY"
-  integration_method = "POST"
-}
-resource "aws_apigatewayv2_route" "create_items_route" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  route_key = "POST /create-items"
-  target    = "integrations/${aws_apigatewayv2_integration.create_items_integration.id}"
+module "get_lists_api" {
+  source = "./api_endpoint_module"
+  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
+  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  route="get-list"
+  method="GET"
+  lambda_arn = module.get_lists_lambda.invoke_arn
+  lambda_function_name = module.get_lists_lambda.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.auth.id
 }
 
-resource "aws_apigatewayv2_integration" "create_event_integration" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  integration_uri    = module.create_event.lambda_arn
-  integration_type   = "AWS_PROXY"
-  integration_method = "POST"
+module "create_list_api" {
+  source = "./api_endpoint_module"
+  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
+  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  route="create-list"
+  method="POST"
+  lambda_arn = module.create_list_lambda.invoke_arn
+  lambda_function_name = module.create_list_lambda.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.auth.id
 }
-resource "aws_apigatewayv2_route" "create_event_route" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-  route_key = "POST /create-event"
-  target    = "integrations/${aws_apigatewayv2_integration.create_event_integration.id}"
+module "create_items_api" {
+  source = "./api_endpoint_module"
+  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
+  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  route="create-items"
+  method="POST"
+  lambda_arn = module.create_items.invoke_arn
+  lambda_function_name = module.create_items.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.auth.id
+}
+module "create_events_api" {
+  source = "./api_endpoint_module"
+  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
+  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  route="create-events"
+  method="POST"
+  lambda_arn = module.create_event.invoke_arn
+  lambda_function_name = module.create_event.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.auth.id
+}
+module "get_events_api" {
+  source = "./api_endpoint_module"
+  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
+  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  route="get-event"
+  method="GET"
+  lambda_arn = module.get_event.invoke_arn
+  lambda_function_name = module.get_event.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "COGNITO_USER_POOLS"
+  authorizer_id = aws_api_gateway_authorizer.auth.id
 }
 
-resource "aws_apigatewayv2_integration" "get_event_integration" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  integration_uri    = module.get_event.lambda_arn
-  integration_type   = "AWS_PROXY"
-  integration_method = "POST"
-}
-resource "aws_apigatewayv2_route" "get_event_route" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  route_key = "GET /get-event/{eventId}"
-  target    = "integrations/${aws_apigatewayv2_integration.get_event_integration.id}"
-}
-
-resource "aws_apigatewayv2_integration" "get_events_integration" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  integration_uri    = module.get_events.lambda_arn
-  integration_type   = "AWS_PROXY"
-  integration_method = "POST"
-}
-resource "aws_apigatewayv2_route" "get_events_route" {
-  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-
-  route_key = "GET /get-events"
-  target    = "integrations/${aws_apigatewayv2_integration.get_events_integration.id}"
-}
 
 resource "aws_cloudwatch_log_group" "api_gw" {
-  name = "/aws/api_gw/${aws_apigatewayv2_api.familylistapp_gateway.name}"
+  name = "/aws/api_gw/${aws_api_gateway_rest_api.familylistapp_gateway.name}"
 
   retention_in_days = 30
 }
+resource "aws_cloudwatch_log_group" "api_gw_stage" {
+  name = "/aws/api_gw/${aws_api_gateway_stage.dev.id}/example"
 
-resource "aws_lambda_permission" "api_gw" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.create_list_lambda.lambda_function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
-}
-resource "aws_lambda_permission" "api_gw_get" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.get_list_lambda.lambda_function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
-}
-resource "aws_lambda_permission" "api_gw_create_list" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.create_items.lambda_function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
-}
-
-resource "aws_lambda_permission" "api_gw_create_event" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.create_event.lambda_function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
-}
-resource "aws_lambda_permission" "api_gw_get_event" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.get_event.lambda_function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
-}
-resource "aws_lambda_permission" "api_gw_get_events" {
-  statement_id  = "AllowExecutionFromAPIGateway"
-  action        = "lambda:InvokeFunction"
-  function_name = module.get_events.lambda_function_name
-  principal     = "apigateway.amazonaws.com"
-
-  source_arn = "${aws_apigatewayv2_api.familylistapp_gateway.execution_arn}/*/*"
+  retention_in_days = 30
 }
