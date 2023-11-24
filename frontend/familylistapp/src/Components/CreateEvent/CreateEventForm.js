@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import {Form,Col, Row, Button} from 'react-bootstrap';
 import { CreateEvent } from './CreateEventAPI';
+import {fetchAuthSession } from 'aws-amplify/auth';
+
 export default function CreateEventForm(){
     const [name, setName] = useState('');
     const [date,setDate] = useState();
@@ -8,9 +10,10 @@ export default function CreateEventForm(){
     const [recieving,setRecieving] = useState();
     const today = new Date().toISOString().split('T')[0];
     let items='';
-    const handleSubmit = (e) =>{
+    const handleSubmit = async (e) =>{
+        var token = await fetchAuthSession();
         e.preventDefault();
-        CreateEvent(name,date);
+        CreateEvent(name,date,token.tokens?.accessToken.toString());
         console.log(e);
     }
     return (

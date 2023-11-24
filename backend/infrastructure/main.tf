@@ -191,113 +191,154 @@ resource "aws_cognito_user_pool_client" "client" {
   explicit_auth_flows = ["USER_PASSWORD_AUTH"]
 }
 #api gateway
-resource "aws_api_gateway_rest_api" "familylistapp_gateway" {
+resource "aws_apigatewayv2_api" "familylistapp_gateway" {
   name          = "FamiyListAppsGateway"
+  protocol_type = "HTTP"
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["POST", "GET", "OPTIONS"]
+    allow_headers = ["content-type","authorization"]
+    max_age = 300
+  }
+}
+resource "aws_apigatewayv2_stage" "familylistapp_gateway_stage" {
+  api_id = aws_apigatewayv2_api.familylistapp_gateway.id
+
+  name        = "familylistapp_gateway_stage"
+  auto_deploy = true
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.api_gw.arn
+
+    format = jsonencode({
+      requestId               = "$context.requestId"
+      sourceIp                = "$context.identity.sourceIp"
+      requestTime             = "$context.requestTime"
+      protocol                = "$context.protocol"
+      httpMethod              = "$context.httpMethod"
+      resourcePath            = "$context.resourcePath"
+      routeKey                = "$context.routeKey"
+      status                  = "$context.status"
+      responseLength          = "$context.responseLength"
+      integrationErrorMessage = "$context.integrationErrorMessage"
+      }
+    )
+  }
 }
 
-resource "aws_api_gateway_authorizer" "auth" {
-  name          = "CognitoUserPoolAuthorizer"
-  type          = "COGNITO_USER_POOLS"
-  rest_api_id   = aws_api_gateway_rest_api.familylistapp_gateway.id
-  provider_arns = ["${aws_cognito_user_pool.pool.arn}"]
-}
-resource "aws_api_gateway_deployment" "api_deployment" {
-  rest_api_id = aws_api_gateway_rest_api.familylistapp_gateway.id
-  triggers = {
-    redeployment = "${join(",",[md5(file("api_endpoint_module/api_endpoint.tf")),md5(file("main.tf"))])}"
+
+resource "aws_apigatewayv2_authorizer" "auth" {
+  # name          = "CognitoUserPoolAuthorizer"
+  # type          = "JWT"
+  # rest_api_id   = aws_apigatewayv2_api.familylistapp_gateway.id
+  # provider_arns = ["${aws_cognito_user_pool.pool.arn}"]
+  api_id           = aws_apigatewayv2_api.familylistapp_gateway.id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = "authorizer"
+
+  jwt_configuration {
+     audience = [aws_cognito_user_pool_client.client.id]
+    issuer   = "https://${aws_cognito_user_pool.pool.endpoint}"
   }
-  stage_description = "${join(",",[md5(file("api_endpoint_module/api_endpoint.tf")),md5(file("main.tf"))])}" #workaround to force a deploy to happen if the files change.
-  lifecycle {
-    create_before_destroy = true
-  }
-  depends_on = [  
-    module.get_lists_api,
-    module.create_items_api,
-    module.create_list_api,
-    module.create_events_api,
-     ]
 }
-resource "aws_api_gateway_stage" "dev" {
-  deployment_id = aws_api_gateway_deployment.api_deployment.id
-  rest_api_id   = aws_api_gateway_rest_api.familylistapp_gateway.id
-  stage_name    = "dev"
-}
+# resource "aws_api_gateway_deployment" "api_deployment" {
+#   rest_api_id = aws_apigatewayv2_api.familylistapp_gateway.id
+#   triggers = {
+#     redeployment = "${join(",",[md5(file("api_endpoint_module/api_endpoint.tf")),md5(file("main.tf"))])}"
+#   }
+#   stage_description = "${join(",",[md5(file("api_endpoint_module/api_endpoint.tf")),md5(file("main.tf"))])}" #workaround to force a deploy to happen if the files change.
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+#   depends_on = [  
+#     module.get_lists_api,
+#     module.create_items_api,
+#     module.create_list_api,
+#     module.create_events_api,
+#      ]
+# }
+# resource "aws_api_gateway_stage" "dev" {
+#   deployment_id = aws_api_gateway_deployment.api_deployment.id
+#   rest_api_id   = aws_apigatewayv2_api.familylistapp_gateway.id
+#   stage_name    = "dev"
+# }
 
 module "get_lists_api" {
   source = "./api_endpoint_module"
-  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
-  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="get-list"
   method="GET"
   lambda_arn = module.get_lists_lambda.invoke_arn
   lambda_function_name = module.get_lists_lambda.lambda_function_name
   region = var.region
   account_id = local.account_id
-  auth_type = "COGNITO_USER_POOLS"
-  authorizer_id = aws_api_gateway_authorizer.auth.id
+  auth_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
 
 module "create_list_api" {
   source = "./api_endpoint_module"
-  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
-  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="create-list"
   method="POST"
   lambda_arn = module.create_list_lambda.invoke_arn
   lambda_function_name = module.create_list_lambda.lambda_function_name
   region = var.region
   account_id = local.account_id
-  auth_type = "COGNITO_USER_POOLS"
-  authorizer_id = aws_api_gateway_authorizer.auth.id
+  auth_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
 module "create_items_api" {
   source = "./api_endpoint_module"
-  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
-  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="create-items"
   method="POST"
   lambda_arn = module.create_items.invoke_arn
   lambda_function_name = module.create_items.lambda_function_name
   region = var.region
   account_id = local.account_id
-  auth_type = "COGNITO_USER_POOLS"
-  authorizer_id = aws_api_gateway_authorizer.auth.id
+  auth_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
 module "create_events_api" {
   source = "./api_endpoint_module"
-  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
-  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="create-events"
   method="POST"
   lambda_arn = module.create_event.invoke_arn
   lambda_function_name = module.create_event.lambda_function_name
   region = var.region
   account_id = local.account_id
-  auth_type = "COGNITO_USER_POOLS"
-  authorizer_id = aws_api_gateway_authorizer.auth.id
+  auth_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
 module "get_events_api" {
   source = "./api_endpoint_module"
-  gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
-  gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="get-events"
   method="GET"
   lambda_arn = module.get_events.invoke_arn
   lambda_function_name = module.get_events.lambda_function_name
   region = var.region
   account_id = local.account_id
-  auth_type = "COGNITO_USER_POOLS"
-  authorizer_id = aws_api_gateway_authorizer.auth.id
+  auth_type = "JWT"
+  authorizer_id =aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
 
 
 resource "aws_cloudwatch_log_group" "api_gw" {
-  name = "/aws/api_gw/${aws_api_gateway_rest_api.familylistapp_gateway.name}"
+  name = "/aws/api_gw/${aws_apigatewayv2_api.familylistapp_gateway.name}"
 
   retention_in_days = 30
 }
 resource "aws_cloudwatch_log_group" "api_gw_stage" {
-  name = "/aws/api_gw/${aws_api_gateway_stage.dev.id}/example"
+  name = "/aws/api_gw/${aws_apigatewayv2_stage.familylistapp_gateway_stage.id}/example"
 
   retention_in_days = 30
 }

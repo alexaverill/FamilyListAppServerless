@@ -1,6 +1,6 @@
 
 export async function CreateEvent(name,date,token){
-        await fetch(process.env.REACT_APP_API_URL+'/create-event', {
+        await fetch(process.env.REACT_APP_API_URL+'/create-events', {
         method: 'POST',
         headers:{
          'Authorization':`Bearer ${token}`,

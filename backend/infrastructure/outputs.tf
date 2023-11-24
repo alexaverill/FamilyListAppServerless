@@ -1,7 +1,7 @@
 output "base_url" {
   description = "Base URL for API Gateway"
 
-  value = aws_api_gateway_stage.dev.invoke_url
+  value = aws_apigatewayv2_stage.familylistapp_gateway_stage.invoke_url
 }
 output "CognitoPool"{
   description = "Cognito Pool ID"

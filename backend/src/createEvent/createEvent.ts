@@ -41,7 +41,10 @@ export const handler: Handler = async (event, context) => {
         body: JSON.stringify({
           message: parsedEvent,
           input: event,
-        })
+        }),
+        headers : {
+          'Access-Control-Allow-Origin': '*'
+      }
       }
 };
 

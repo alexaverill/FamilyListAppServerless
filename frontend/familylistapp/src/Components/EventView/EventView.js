@@ -12,8 +12,10 @@ useEffect(()=>{
 },[])
 const LoadEvents = async()=>{
     var token = await fetchAuthSession();
-    let data = await GetEvents(token.tokens?.idToken.toString());
+    let data = await GetEvents(token.tokens?.accessToken.toString());
+    if(data){
     setEvents(data);
+    }
 }
     return (
 
@@ -25,7 +27,9 @@ const LoadEvents = async()=>{
             
         </div>
         <Row>
-            {events?.map(event=> <EventCard title={event.name} date={event.date} image={'event_images/1.jpg'}/>)}
+            {
+            events?.map(event=> <EventCard title={event.name} date={event.date} image={'event_images/1.jpg'}/>)
+            }
         </Row>
         </Container>
     );
