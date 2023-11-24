@@ -203,6 +203,10 @@ resource "aws_api_gateway_authorizer" "auth" {
 }
 resource "aws_api_gateway_deployment" "api_deployment" {
   rest_api_id = aws_api_gateway_rest_api.familylistapp_gateway.id
+  triggers = {
+    redeployment = "${join(",",[md5(file("api_endpoint_module/api_endpoint.tf")),md5(file("main.tf"))])}"
+  }
+  stage_description = "${join(",",[md5(file("api_endpoint_module/api_endpoint.tf")),md5(file("main.tf"))])}" #workaround to force a deploy to happen if the files change.
   lifecycle {
     create_before_destroy = true
   }
@@ -276,10 +280,10 @@ module "get_events_api" {
   source = "./api_endpoint_module"
   gateway_root_resource_id=aws_api_gateway_rest_api.familylistapp_gateway.root_resource_id
   gateway_id=aws_api_gateway_rest_api.familylistapp_gateway.id
-  route="get-event"
+  route="get-events"
   method="GET"
-  lambda_arn = module.get_event.invoke_arn
-  lambda_function_name = module.get_event.lambda_function_name
+  lambda_arn = module.get_events.invoke_arn
+  lambda_function_name = module.get_events.lambda_function_name
   region = var.region
   account_id = local.account_id
   auth_type = "COGNITO_USER_POOLS"

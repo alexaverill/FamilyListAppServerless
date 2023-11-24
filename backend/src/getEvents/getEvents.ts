@@ -20,6 +20,12 @@ export const handler: Handler = async (event, context) => {
     });
     return {
         statusCode: 200,
-        body: JSON.stringify(events)
+        body: JSON.stringify(events),
+        headers : {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Headers': 'Authorization,Content-Type',
+          'Access-Control-Allow-Method': 'GET,POST,OPTIONS',
+      }
       }
 };
