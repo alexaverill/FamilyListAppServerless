@@ -8,11 +8,9 @@ const docClient = DynamoDBDocumentClient.from(client);
 export const handler: Handler = async (event, context) => {
     console.log(event);
     const command =new ScanCommand({
-        TableName:"Events",
-        IndexName:"eventIdIndex",
-    });
-    //TODO filter by date/Active
-    
+        TableName:"Users",
+        IndexName:"usernameIndex",
+    });    
       const response = await docClient.send(command);
       console.log(response);
       const events = response?.Items.map( (item) => {

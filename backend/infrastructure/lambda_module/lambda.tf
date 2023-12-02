@@ -117,6 +117,13 @@ resource "aws_iam_policy" "iam_policy_for_lambda"{
                 "logs:DescribeLogStreams"
             ],
             "Resource": "*"
+        },
+        {
+          "Effect":"Allow",
+          "Action":[
+            "cognito-idp:AdminCreateUser"
+          ]
+          "Resource":"arn:aws:cognito-idp:us-west-2:219875217854:userpool/*"
         }
         ]
         }

@@ -28,8 +28,7 @@ const LoadEvents = async()=>{
         </div>
         <Row>
             {
-            events?.map(event=> <EventCard title={event.name} date={event.date} image={'event_images/1.jpg'}/>)
-            }
+            events?.map(event=> <EventCard title={event.name} date={event.date} image={'event_images/1.jpg'}/>)}
         </Row>
         </Container>
     );

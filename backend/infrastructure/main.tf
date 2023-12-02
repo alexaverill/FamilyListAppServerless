@@ -66,6 +66,22 @@ module "get_events" {
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
   handler_path = "getEvents.handler"
 }
+module "create_user" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/createUser/dist"
+  output_path = "${path.module}/createUser.zip"
+  lambda_name = "family-list-app-create-user"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "createUser.handler"
+}
+module "get_users" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/getUsers/dist"
+  output_path = "${path.module}/getUsers.zip"
+  lambda_name = "family-list-app-get-users"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "getUsers.handler"
+}
 #Dynamo setup
 resource "aws_dynamodb_table" "lists-dynamodb-table" {
   name           = "Lists"
@@ -175,6 +191,33 @@ resource "aws_dynamodb_table" "events-dynamodb-table" {
   }
   tags = {
     Name        = "listapp-event-table"
+
+  }
+}
+resource "aws_dynamodb_table" "users-dynamodb-table" {
+  name           = "Users"
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 20
+  write_capacity = 20
+  hash_key       = "userId"
+  range_key      = "username"
+  attribute {
+    name = "userId"
+    type = "S"
+  }
+  attribute {
+    name="username"
+    type = "S"
+  }
+  global_secondary_index {
+    name = "usernameIndex"
+    hash_key = "username"
+    write_capacity = 10 
+    read_capacity = 10
+    projection_type = "ALL"
+  }
+  tags = {
+    Name        = "listapp-users-table"
 
   }
 }
@@ -324,6 +367,19 @@ module "get_events_api" {
   method="GET"
   lambda_arn = module.get_events.invoke_arn
   lambda_function_name = module.get_events.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "JWT"
+  authorizer_id =aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
+}
+module "get_users_api" {
+  source = "./api_endpoint_module"
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
+  route="get-users"
+  method="GET"
+  lambda_arn = module.get_users.invoke_arn
+  lambda_function_name = module.get_users.lambda_function_name
   region = var.region
   account_id = local.account_id
   auth_type = "JWT"

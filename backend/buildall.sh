@@ -1,4 +1,4 @@
-declare -a arr=("createEvent" "createList" "getEvent" "getEvents" "getList" "getLists")
+declare -a arr=("createEvent" "createList" "getEvent" "getEvents" "getList" "getLists" "createUser" "getUsers")
 for item in "${arr[@]}"; do
     echo "$item"
     lambdaPath="./src/${item}"

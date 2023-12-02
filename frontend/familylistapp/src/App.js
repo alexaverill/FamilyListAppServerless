@@ -16,6 +16,7 @@ function App() {
       <Container className="innerContent">
       <Routes>
           <Route path="/" element={<EventView/>}/>
+          <Route path="/event/:eventid" element={<Admin/>}/>
           <Route path="/admin" element={<Admin/>}/>
           <Route path="/login" element={<Login/>}/>
         </Routes>
