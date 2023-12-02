@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import EventCard from '../EventCard/EventCard';
 import './EventView.css'
 import { Container,Row } from 'react-bootstrap';
-import { GetEvents } from '../../API/EventAPI';
+import { GetEvents, GetEventsByUser } from '../../API/EventAPI';
 import {fetchAuthSession } from 'aws-amplify/auth';
 export default function EventView(){
    const [events, setEvents] = useState([]);
@@ -12,7 +12,8 @@ useEffect(()=>{
 },[])
 const LoadEvents = async()=>{
     var token = await fetchAuthSession();
-    let data = await GetEvents(token.tokens?.accessToken.toString());
+    console.log(token);
+    let data = await GetEventsByUser(token.userSub,token.tokens?.accessToken.toString());
     if(data){
     setEvents(data);
     }

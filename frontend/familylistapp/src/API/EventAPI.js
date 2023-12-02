@@ -13,7 +13,20 @@ export async function GetEvents(token) {
     return;
   });
 }
-
+export async function GetEventsByUser(userId,token){
+  let url = process.env.REACT_APP_API_URL + '/get-events/'+userId
+  return await fetch(url, {
+    method: "GET", // POST, PUT, DELETE, etc.
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    mode: "cors",
+  }).then(response => response.json()).then(data => { console.log(data); return data; }).catch(err => {
+    console.log(err.message);
+    return;
+  });
+}
 export async function CreateEvent(eventObject,token){
   await fetch(process.env.REACT_APP_API_URL+'/create-events', {
   method: 'POST',

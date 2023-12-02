@@ -308,6 +308,7 @@ resource "aws_apigatewayv2_authorizer" "auth" {
 # }
 
 module "get_lists_api" {
+  permission_name = "get-list"
   source = "./api_endpoint_module"
   gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="get-list"
@@ -322,6 +323,7 @@ module "get_lists_api" {
 }
 
 module "create_list_api" {
+  permission_name = "create-list"
   source = "./api_endpoint_module"
   gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="create-list"
@@ -335,6 +337,7 @@ module "create_list_api" {
   gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
 module "create_items_api" {
+  permission_name = "create-items"
   source = "./api_endpoint_module"
   gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="create-items"
@@ -348,6 +351,7 @@ module "create_items_api" {
   gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
 module "create_events_api" {
+  permission_name = "create-events"
   source = "./api_endpoint_module"
   gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="create-events"
@@ -360,7 +364,9 @@ module "create_events_api" {
   authorizer_id = aws_apigatewayv2_authorizer.auth.id
   gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
+
 module "get_events_api" {
+  permission_name = "get-events"
   source = "./api_endpoint_module"
   gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="get-events"
@@ -373,7 +379,22 @@ module "get_events_api" {
   authorizer_id =aws_apigatewayv2_authorizer.auth.id
   gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
+module "get_events_proxy_api" {
+  permission_name = "get-events-proxy"
+  source = "./api_endpoint_module"
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
+  route="get-events/{proxy+}"
+  method="GET"
+  lambda_arn = module.get_events.invoke_arn
+  lambda_function_name = module.get_events.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "JWT"
+  authorizer_id =aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
+}
 module "get_users_api" {
+  permission_name = "get-users"
   source = "./api_endpoint_module"
   gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
   route="get-users"

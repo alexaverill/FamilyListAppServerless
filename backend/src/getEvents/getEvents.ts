@@ -18,6 +18,24 @@ export const handler: Handler = async (event, context) => {
       const events = response?.Items.map( (item) => {
         return unmarshall(item);
     });
+    if(event.pathParameters.proxy){
+      //filter by userId
+      var userId = event.pathParameters.proxy;
+      let filteredEvents = events.filter(event=>{
+        let inGiving = event.giving?.findIndex((element:string)=>element === userId) >=0;
+        let inRecieving = event.recieving?.findIndex((element:string)=>element === userId)>=0;
+        if(inGiving || inRecieving){
+          return event;
+        }
+      })
+      return {
+        statusCode: 200,
+        body: JSON.stringify(filteredEvents),
+        headers : {
+          'Access-Control-Allow-Origin': '*',
+      }
+      }
+    }
     return {
         statusCode: 200,
         body: JSON.stringify(events),
