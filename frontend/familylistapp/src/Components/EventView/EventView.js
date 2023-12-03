@@ -1,36 +1,30 @@
 import { useEffect, useState } from 'react';
 import EventCard from '../EventCard/EventCard';
-import './EventView.css'
 import { Container,Row } from 'react-bootstrap';
-import { GetEvents, GetEventsByUser } from '../../API/EventAPI';
+import { GetEvent } from '../../API/EventAPI';
+import { useParams } from 'react-router-dom';
 import {fetchAuthSession } from 'aws-amplify/auth';
 export default function EventView(){
+    const {id} = useParams();
    const [events, setEvents] = useState([]);
 useEffect(()=>{
-    LoadEvents();
+    LoadEvent(id);
     
-},[])
-const LoadEvents = async()=>{
+},[id])
+const LoadEvent = async(id)=>{
     var token = await fetchAuthSession();
     console.log(token);
-    let data = await GetEventsByUser(token.userSub,token.tokens?.accessToken.toString());
+    let data = await GetEvent(id,token.tokens?.accessToken.toString());
     if(data){
     setEvents(data);
+    console.log(data);
     }
 }
     return (
 
         <Container className="innerContent">
-        <div className="homeHeader">
-            <div className="headerText">
-                <h2>Events</h2>
-            </div>
-            
-        </div>
-        <Row>
-            {
-            events?.map(event=> <EventCard title={event.name} date={event.date} image={'event_images/1.jpg'}/>)}
-        </Row>
+            <h1>Event View</h1>
+            <h1>{id}</h1>
         </Container>
     );
 }

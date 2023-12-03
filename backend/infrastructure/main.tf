@@ -393,6 +393,20 @@ module "get_events_proxy_api" {
   authorizer_id =aws_apigatewayv2_authorizer.auth.id
   gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
+module "get_event_proxy_api" {
+  permission_name = "get-event-proxy"
+  source = "./api_endpoint_module"
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
+  route="get-event/{proxy+}"
+  method="GET"
+  lambda_arn = module.get_event.invoke_arn
+  lambda_function_name = module.get_event.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "JWT"
+  authorizer_id =aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
+}
 module "get_users_api" {
   permission_name = "get-users"
   source = "./api_endpoint_module"

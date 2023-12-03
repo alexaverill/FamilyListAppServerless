@@ -1,7 +1,6 @@
 import Card from 'react-bootstrap/Card';
 import './EventCard.css'
-export default function EventCard({eventId,image,date,title}) {
-    let url ='';
+export default function EventCard({eventId,image,date,title,url}) {
     console.log(image);
     const options = {
         year: 'numeric',

@@ -41,13 +41,13 @@ export async function CreateEvent(eventObject,token){
      console.log(err.message);
   });        
 }
-export async function GetEvent(token) {
-  let url = process.env.REACT_APP_API_URL + '/get-event'
+export async function GetEvent(eventId,token) {
+  let url = process.env.REACT_APP_API_URL + '/get-event/'+eventId
   return await fetch(url, {
     method: "GET", // POST, PUT, DELETE, etc.
     headers: {
       'Authorization': `Bearer ${token}`,
-      "Content-Type": "text/plain;charset=UTF-8",
+      "Content-Type": "=application/json",
     },
 
     mode: "cors",

@@ -19,7 +19,7 @@ export const handler: Handler = async (event, context) => {
         IndexName:"eventIdIndex",
         KeyConditionExpression:"eventId=:e",
         ExpressionAttributeValues: {
-            ':e': {S:`${event.pathParameters.eventId.toString()}`}
+            ':e': {S:`${event.pathParameters.proxy.toString()}`}
            }
     });
     
@@ -42,5 +42,5 @@ export const handler: Handler = async (event, context) => {
     }
 };
 const validateRequest = (request:any )=>{
-  return request.pathParameters?.eventId;
+  return request.pathParameters?.proxy;
 }
