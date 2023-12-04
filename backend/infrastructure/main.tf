@@ -85,9 +85,7 @@ module "get_users" {
 #Dynamo setup
 resource "aws_dynamodb_table" "lists-dynamodb-table" {
   name           = "Lists"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 20
-  write_capacity = 21
+  billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "listId"
   range_key      = "eventId"
 
@@ -137,9 +135,7 @@ resource "aws_dynamodb_table" "lists-dynamodb-table" {
 }
 resource "aws_dynamodb_table" "items-dynamodb-table" {
   name           = "ListItems"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 20
-  write_capacity = 20
+  billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "itemId"
   range_key      = "listId"
 
@@ -169,9 +165,7 @@ resource "aws_dynamodb_table" "items-dynamodb-table" {
 }
 resource "aws_dynamodb_table" "events-dynamodb-table" {
   name           = "Events"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 20
-  write_capacity = 20
+  billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "eventId"
   range_key      = "name"
   attribute {
@@ -196,9 +190,7 @@ resource "aws_dynamodb_table" "events-dynamodb-table" {
 }
 resource "aws_dynamodb_table" "users-dynamodb-table" {
   name           = "Users"
-  billing_mode   = "PROVISIONED"
-  read_capacity  = 20
-  write_capacity = 20
+  billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "userId"
   range_key      = "username"
   attribute {

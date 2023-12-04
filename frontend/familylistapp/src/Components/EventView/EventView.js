@@ -4,9 +4,10 @@ import { Container,Row } from 'react-bootstrap';
 import { GetEvent } from '../../API/EventAPI';
 import { useParams } from 'react-router-dom';
 import {fetchAuthSession } from 'aws-amplify/auth';
+import CreateList from '../CreateList/CreateList';
 export default function EventView(){
     const {id} = useParams();
-   const [events, setEvents] = useState([]);
+   const [event, setEvents] = useState([]);
 useEffect(()=>{
     LoadEvent(id);
     
@@ -16,7 +17,7 @@ const LoadEvent = async(id)=>{
     console.log(token);
     let data = await GetEvent(id,token.tokens?.accessToken.toString());
     if(data){
-    setEvents(data);
+    setEvents(data[0]);
     console.log(data);
     }
 }
@@ -24,7 +25,8 @@ const LoadEvent = async(id)=>{
 
         <Container className="innerContent">
             <h1>Event View</h1>
-            <h1>{id}</h1>
+            <h1>{event?.name}</h1>
+            <CreateList/>
         </Container>
     );
 }

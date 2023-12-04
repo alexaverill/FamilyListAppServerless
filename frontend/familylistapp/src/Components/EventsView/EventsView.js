@@ -8,7 +8,6 @@ export default function EventsView(){
    const [events, setEvents] = useState([]);
 useEffect(()=>{
     LoadEvents();
-    
 },[])
 const LoadEvents = async()=>{
     var token = await fetchAuthSession();
