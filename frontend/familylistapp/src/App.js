@@ -8,6 +8,7 @@ import EventView from './Components/EventView/EventView'
 import Login from './Components/LoginComponent/Login';
 import { Route, Routes } from 'react-router-dom';
 import Admin from './Components/Admin/Admin';
+import CreateList from './Components/CreateList/CreateList';
 
 function App() {
 
@@ -18,6 +19,7 @@ function App() {
       <Routes>
           <Route path="/" element={<EventsView/>}/>
           <Route path="/event/:id" element={<EventView/>}/>
+          <Route path="/event/:id/create" element={<CreateList/>}/>
           <Route path="/admin" element={<Admin/>}/>
           <Route path="/login" element={<Login/>}/>
         </Routes>

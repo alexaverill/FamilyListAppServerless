@@ -1,15 +1,36 @@
 import { useState } from "react"
 import { Col, InputGroup, Row, Form, Button } from 'react-bootstrap';
 import ListItem from "../ListItem/ListItem";
-export default function CreateListItem({index,deleteCallback}) {
+import { Link, useParams } from 'react-router-dom';
+import { fetchAuthSession } from "aws-amplify/auth";
+import { CreateItem } from "../../API/ListItemApi";
+
+export default function CreateListItem({index,deleteCallback,eventId}) {
+    const [itemId,setItemId] = useState('');
     const [name, setName] = useState('');
     const [cost, setCost] = useState('');
     const [url, setUrl] = useState('');
     const [comments, setComments] = useState('');
     const [editng,setEditing] = useState(true);
-    const handleSubmit = (event) => { 
+    const handleSubmit = async (event) => { 
         event.preventDefault();
         setEditing(false);
+        let userData = await fetchAuthSession();
+        let itemData = {
+            itemId,
+            name,
+            cost,
+            url,
+            comments,
+            userId:userData.userSub,
+            eventId
+        };
+        console.log(itemData);
+        let token = await fetchAuthSession();
+        let result = await CreateItem(itemData,token.tokens?.accessToken.toString())
+        if(result){
+            setItemId(result.itemId);
+        }
     }
     const handleDelete = ()=>{
         deleteCallback(index);
@@ -17,7 +38,6 @@ export default function CreateListItem({index,deleteCallback}) {
     const handleEdit = ()=>{
         setEditing(true);
     }
-    //noValidate validated={this.state.validated}       
     if(editng){
     return (
         <Row lg={1} md={1} sm={1} xl={1} xs={1}>

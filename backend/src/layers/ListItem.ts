@@ -1,4 +1,6 @@
 export class ListItem{
+    public eventId:string;
+    public userId:string;
     public itemId:String;
     public name:String;
     public url:String;

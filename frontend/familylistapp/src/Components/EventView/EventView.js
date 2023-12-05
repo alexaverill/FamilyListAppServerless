@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import EventCard from '../EventCard/EventCard';
-import { Container,Row } from 'react-bootstrap';
+import { Button, Container,Row,Col } from 'react-bootstrap';
 import { GetEvent } from '../../API/EventAPI';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {fetchAuthSession } from 'aws-amplify/auth';
 import CreateList from '../CreateList/CreateList';
 export default function EventView(){
@@ -21,12 +21,34 @@ const LoadEvent = async(id)=>{
     console.log(data);
     }
 }
+const lists = [];
+const isRecieving = true;
+let btnText = 'Create Your List';
+let btnClasses = "header-btn btn btn-primary fullWidthBtn";
+let url = document.URL+"/create";
     return (
 
         <Container className="innerContent">
-            <h1>Event View</h1>
-            <h1>{event?.name}</h1>
-            <CreateList/>
+            <Container className="innerContent">
+                <Row> <Link href="/">
+                <a className="backlink"> &lsaquo;&lsaquo; Return to All Events</a></Link> </Row> 
+            <div className="header-column">
+                <div className="headerText">
+                    <h2>{event.name}</h2>
+                </div>
+                <div className="header-date">{event.date}</div>
+                <Row className="headerRow">
+                    <Col sm={10} className="headerCol">
+                    <a href={url} className={btnClasses}>{btnText}</a>;
+                     </Col>
+                
+                </Row>
+            </div>
+        
+            
+            
+            {lists}
+            </Container>
         </Container>
     );
 }

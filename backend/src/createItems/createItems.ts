@@ -38,13 +38,10 @@ export const handler: Handler = async (event, context) => {
     console.log('EVENT: \n' + JSON.stringify(event, null, 2));
     return {
         statusCode: 200,
-        body: JSON.stringify({
-          message: listItem,
-          input: event,
-        })
+        body: JSON.stringify(listItem)
       }
 };
 
 const validateIsListItem = (item:any)=>{
-  return item.listId;
+  return item.eventId && item.userId;
 }

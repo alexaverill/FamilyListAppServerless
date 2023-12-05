@@ -1,15 +1,16 @@
 import { useState } from "react"
 import {Row,Container,Button} from 'react-bootstrap';
-import {Link} from 'react-router-dom'
+import {Link, useParams } from 'react-router-dom';
 import CreateListItem from "./CreateListItem";
 
-export default function CreateList({eventName,url}){
+export default function CreateList({eventName,url,eventId}){
+    const {id} = useParams();
     const [emailSent,setEmailSent] = useState(false);
     const [items, setItems] = useState([]);
     const sendReminder = ()=>{}
     const handleAdd = ()=>{
         console.log("Adding");
-        setItems([...items,<CreateListItem index={items.length+1} deleteCallback={handleDeleted}/>])
+        setItems([...items,<CreateListItem index={items.length+1} deleteCallback={handleDeleted} key={items.length+1} eventId={id}/>])
     
     }
     const handleDeleted = (index)=>{

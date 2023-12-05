@@ -107,15 +107,11 @@ resource "aws_dynamodb_table" "lists-dynamodb-table" {
     name="listIdIndex"
     hash_key = "listId"
     projection_type = "ALL"
-    write_capacity     = 10
-    read_capacity      = 10
   }
   global_secondary_index {
     name               = "UserIdIndex"
     hash_key           = "userId"
     range_key          = "listId"
-    write_capacity     = 10
-    read_capacity      = 10
     projection_type    = "ALL"
     #non_key_attributes = ["UserId"]
   }
@@ -123,8 +119,6 @@ resource "aws_dynamodb_table" "lists-dynamodb-table" {
     name               = "eventIndex"
     hash_key           = "eventId"
     range_key          = "listId"
-    write_capacity     = 10
-    read_capacity      = 10
     projection_type    = "ALL"
     #non_key_attributes = ["UserId"]
   }
@@ -137,25 +131,30 @@ resource "aws_dynamodb_table" "items-dynamodb-table" {
   name           = "ListItems"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "itemId"
-  range_key      = "listId"
+  range_key      = "eventId"
 
   attribute {
     name = "itemId"
-    type = "N"
-  }
-  attribute {
-    name = "listId"
     type = "S"
   }
-
-
-
+  attribute {
+    name="userId"
+    type="S"
+  }
+  attribute {
+    name="eventId"
+    type = "S"
+  }
+    global_secondary_index {
+    name               = "userIdIndex"
+    hash_key           = "userId"
+    range_key          = "eventId"
+    projection_type    = "ALL"
+  }
   global_secondary_index {
-    name               = "listIdIndex"
-    hash_key           = "itemId"
-    range_key          = "listId"
-    write_capacity     = 10
-    read_capacity      = 10
+    name               = "eventIdIndex"
+    hash_key           = "eventId"
+    range_key          = "itemId"
     projection_type    = "ALL"
   }
   tags = {
