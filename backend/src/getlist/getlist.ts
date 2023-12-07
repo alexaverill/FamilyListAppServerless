@@ -6,23 +6,20 @@ import { unmarshall } from '@aws-sdk/util-dynamodb';
 const client = new DynamoDBClient({ region: "us-west-2" });
 const docClient = DynamoDBDocumentClient.from(client);
 export const handler: Handler = async (event, context) => {
-    console.log(event);
-    if(!validateRequest(event)){
-      return{
-        statusCode:400,
-        body:"eventID is required in the path"
-      }
-    }
+    console.log(event.pathParameters.proxy);
+    let splitPath = event.pathParameters.proxy.split("/");
+    let userId = splitPath[1];
+    let eventId = splitPath[0];
     try{
-    const command =new QueryCommand({
-        TableName:"Lists",
-        IndexName:"listIdIndex",
-        KeyConditionExpression:"listId=:e",
-        ExpressionAttributeValues: {
-            ':e': {S:`${event.pathParameters.listId.toString()}`}
-           }
-    });
-    
+    const command =  new QueryCommand({
+      TableName:"ListItems",
+      IndexName:"userIdIndex",
+      KeyConditionExpression:"eventId=:e and userId=:u",
+    ExpressionAttributeValues: {
+        ':u': {S:`${userId}`},
+        ':e': {S:`${eventId}`}
+       }
+    });    
       const response = await docClient.send(command);
       console.log(response);
       const items = response?.Items.map( (item) => {
@@ -42,5 +39,5 @@ export const handler: Handler = async (event, context) => {
     }
 };
 const validateRequest = (request:any )=>{
-  return request.pathParameters?.eventId;
+  return request.pathParameters?.eventId && request.pathParameters?.userId;
 }

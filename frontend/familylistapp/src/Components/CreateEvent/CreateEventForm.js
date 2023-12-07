@@ -32,8 +32,8 @@ export default function CreateEventForm() {
 
             let result = <Form.Group controlId="formBasicCheckbox" as={Row} key={u.userId}>
                 <Col>{u.username}</Col>
-                <Col><Form.Check inline type="checkbox" name={u.userId} onChange={(evt) => handleGiving(evt)} label="" checked={giving.findIndex((element) => element === u.userId) >= 0} /></Col>
-                <Col><Form.Check inline type="checkbox" name={u.userId} onChange={(evt) => handleReceiving(evt)} label="" checked={recieving.findIndex((element) => element === u.userId) >= 0}/></Col>
+                <Col><Form.Check inline type="checkbox" name={u.userId} onChange={(evt) => handleGiving(evt)} label="" checked={giving.findIndex((element) => element === u) >= 0} /></Col>
+                <Col><Form.Check inline type="checkbox" name={u.userId} onChange={(evt) => handleReceiving(evt)} label="" checked={recieving.findIndex((element) => element === u) >= 0}/></Col>
             </Form.Group>;
 
             return result;
@@ -41,13 +41,17 @@ export default function CreateEventForm() {
     };
     const handleCheckBoxChange = (event, func, stateObj) => {
         let userId = event.target.name;
-        let position = stateObj.findIndex((element) => element === userId);
+        let user = users.find((element)=>element.userId == userId);
+        console.log(user);
+        let position = stateObj.findIndex((element) => element === user);
+        console.log(position)
         if (position < 0) {
-            func([...stateObj, userId]);
+            func([...stateObj, user]);
         } else {
             stateObj.splice(position, 1);
             func([...stateObj]);
         }
+        console.log(giving);
     }
     const handleGiving = (event) => {
         handleCheckBoxChange(event, setGiving, giving)
@@ -66,10 +70,9 @@ export default function CreateEventForm() {
     const checkAll = (event,array,func)=>{
         let checked = event.target.checked;
         if (checked) {
-            let userIds = users.map((user) => user.userId);
-            let newGiving = array.concat(userIds);
-            let givings = _array.uniq(newGiving);
-            func([...givings]);
+            let concatArray = array.concat(users);
+            let finalArray = _array.uniq(concatArray);
+            func([...finalArray]);
         } else {
             func([]);
         }

@@ -1,13 +1,18 @@
 import { useState } from "react"
 import { Col, Row, Form, Button } from 'react-bootstrap';
 export default function ListItem({name,cost,comments,claimed,editable,editCallback,deleteCallback}){
+    const handleClaim = ()=>{}
+
     let deleteBtn = false;
     let claimedText = "";
     let button=""
     if(editable){
         button = <Button variant="outline-primary" className="claimBtn" onClick={editCallback}> Edit </Button>
         deleteBtn = <Button variant="outline-danger"  onClick={deleteCallback}> Delete </Button>
+    }else if(!claimed){
+        button = <Button  className="claimBtn" onClick={handleClaim}> Claim </Button>
     }
+    
     return (
         <>
             <Row className={`listRow` } >

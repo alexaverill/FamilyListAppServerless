@@ -25,13 +25,13 @@ module "create_list_lambda" {
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
   handler_path = "handler.handler"
 }
-module "get_lists_lambda" {
+module "get_list_lambda" {
   source = "./lambda_module"
-  source_path =  "../${path.module}/src/getlists/dist"
-  output_path = "${path.module}/getlists.zip"
-  lambda_name = "get-lists"
+  source_path =  "../${path.module}/src/getlist/dist"
+  output_path = "${path.module}/getlist.zip"
+  lambda_name = "get-list-lambda"
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
-  handler_path = "handler.handler"
+  handler_path = "getlist.handler"
 }
 
 module "create_items" {
@@ -298,14 +298,14 @@ resource "aws_apigatewayv2_authorizer" "auth" {
 #   stage_name    = "dev"
 # }
 
-module "get_lists_api" {
+module "get_list_api" {
   permission_name = "get-list"
   source = "./api_endpoint_module"
   gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
-  route="get-list"
+  route="get-list/{proxy+}"
   method="GET"
-  lambda_arn = module.get_lists_lambda.invoke_arn
-  lambda_function_name = module.get_lists_lambda.lambda_function_name
+  lambda_arn = module.get_list_lambda.invoke_arn
+  lambda_function_name = module.get_list_lambda.lambda_function_name
   region = var.region
   account_id = local.account_id
   auth_type = "JWT"

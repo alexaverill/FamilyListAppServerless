@@ -1,4 +1,6 @@
 import { Handler } from 'aws-lambda';
+import {Event} from "/opt/nodejs/Event"
+import { User } from "/opt/nodejs/User";
 // ES6+ example
 import { DynamoDBClient, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
@@ -26,8 +28,24 @@ export const handler: Handler = async (event, context) => {
       const response = await docClient.send(command);
       console.log(response);
       const items = response?.Items.map( (item) => {
-        return unmarshall(item);
+        return unmarshall(item) as Event;
     });
+    //check if we have lists 
+    for(let event of items){
+      for(let giver of event.giving){
+        const checkListExistsCommand = new QueryCommand({
+          TableName:"ListItems",
+          IndexName:"userIdIndex",
+          KeyConditionExpression:"eventId=:e and userId=:u",
+        ExpressionAttributeValues: {
+            ':u': {S:`${giver.userId}`},
+            ':e': {S:`${event.eventId}`}
+           }
+        });
+        const hasItems = await docClient.send(checkListExistsCommand);
+        giver.hasItems = hasItems.Items?.length>0;
+      }
+    }
     return {
         statusCode: 200,
         body: JSON.stringify(items)

@@ -1,7 +1,9 @@
+import { User } from "./User";
+
 export class Event{
     eventId:string;
     date:Date;
     name:string;
-    givers:string[];
-    recievers:string[];
+    giving:User[];
+    recieving:User[];
 }

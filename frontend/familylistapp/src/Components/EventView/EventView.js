@@ -21,14 +21,32 @@ const LoadEvent = async(id)=>{
     console.log(data);
     }
 }
-const lists = [];
+const lists = event.giving?.map((user)=>{
+    let claimURL = document.URL+`/${user.userId}`; 
+    let text = 'View List';
+
+    let button = 'btn btn-primary fullWidthBtn';
+   
+    // if(list.userId === this.state.userID){
+    //     claimURL = url;
+    //     text = 'Edit Your List';
+    //     button = 'btn btn-outline-primary fullWidthBtn claimBtn';
+    // } 
+    if(user.hasItems){
+    return <Row className="listRow ">
+        <Col sm="4" md="10" lg="10"><div className="userName">{user.username}</div></Col>
+        <Col><a href={claimURL} className={button}>{text}</a></Col>
+
+    </Row>
+    }
+    return <></>
+});
 const isRecieving = true;
 let btnText = 'Create Your List';
 let btnClasses = "header-btn btn btn-primary fullWidthBtn";
 let url = document.URL+"/create";
     return (
 
-        <Container className="innerContent">
             <Container className="innerContent">
                 <Row> <Link href="/">
                 <a className="backlink"> &lsaquo;&lsaquo; Return to All Events</a></Link> </Row> 
@@ -49,6 +67,5 @@ let url = document.URL+"/create";
             
             {lists}
             </Container>
-        </Container>
     );
 }

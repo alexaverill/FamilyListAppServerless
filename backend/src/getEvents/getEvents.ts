@@ -1,6 +1,8 @@
 import { Handler } from 'aws-lambda';
+import {Event} from "/opt/nodejs/Event"
+import { User } from "/opt/nodejs/User";
 // ES6+ example
-import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, QueryCommand, ScanCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 const client = new DynamoDBClient({ region: "us-west-2" });
@@ -21,13 +23,14 @@ export const handler: Handler = async (event, context) => {
     if(event.pathParameters.proxy){
       //filter by userId
       var userId = event.pathParameters.proxy;
-      let filteredEvents = events.filter(event=>{
-        let inGiving = event.giving?.findIndex((element:string)=>element === userId) >=0;
-        let inRecieving = event.recieving?.findIndex((element:string)=>element === userId)>=0;
+      let filteredEvents:unknown = events.filter(event=>{
+        let inGiving = event.giving?.findIndex((element:any)=>element.userId === userId) >=0;
+        let inRecieving = event.recieving?.findIndex((element:any)=>element.userId === userId)>=0;
         if(inGiving || inRecieving){
-          return event;
+          return event as Event;
         }
       })
+
       return {
         statusCode: 200,
         body: JSON.stringify(filteredEvents),
