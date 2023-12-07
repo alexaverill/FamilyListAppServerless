@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { signIn } from 'aws-amplify/auth';
 import { Container, Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [loginError, setLoginError] = useState(false);
+    let navigate = useNavigate();
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log(username)
@@ -15,7 +17,7 @@ export default function Login() {
                 authFlowType: 'USER_PASSWORD_AUTH' 
             }
           }).then((result) => {
-            //Success 
+            navigate("/");
             console.log(result);
         }).catch((err) => {
             setLoginError(true);
