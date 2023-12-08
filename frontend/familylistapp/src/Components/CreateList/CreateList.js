@@ -20,7 +20,7 @@ export default function CreateList({eventName,url,eventId}){
     let emailText = ""
     return (
         <>
-        <Row> <Link href={url}>
+        <Row> <Link to=".." relative="path">
             <a className="backlink"> &lsaquo;&lsaquo; Return to {eventName}</a></Link> </Row>
         <Row className="centered"><h1>Create Your Wishlist for {eventName}</h1></Row>
         <Row className="headerRow"><div><p>{emailText}</p></div></Row>

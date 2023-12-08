@@ -14,7 +14,7 @@ const LoadEvents = async()=>{
     let data = await GetEventsByUser(token.userSub,token.tokens?.accessToken.toString());
     if(data){
         console.log(data);
-    setEvents(data);
+        setEvents(data);
     }
 }
     return (

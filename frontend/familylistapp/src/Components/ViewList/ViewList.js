@@ -28,7 +28,7 @@ return <ListItem id={item.itemId} name={item.name}
         });
 return(
     <Container className="innerContent">
-    <Row> <Link><a className="backlink"> &lsaquo;&lsaquo; Return to</a></Link> </Row> 
+    <Row> <Link to=".." relative="path"><a className="backlink"> &lsaquo;&lsaquo; Return to</a></Link> </Row> 
         <Row className="centered"><h1>{userid}'s Wishlist</h1></Row>
    {list}
     
