@@ -13,12 +13,12 @@ code {
     monospace;
 }
 .btn-primary{
-  background-color: #00647c;
-  border-color: #00647c;
+  background-color: #00647c !important;
+  border-color: #00647c !important;
 }
 .btn-primary:hover{
-  background-color: #003a50;
-  border-color: #003a50;
+  background-color: #003a50 !important;
+  border-color: #003a50 !important;
 }
 .btn-primary:active{
   background-color: #003a50 !important;
@@ -35,4 +35,7 @@ code {
 .btn-outline-primary:active{
   border-color: #00647c !important;
   background-color: #00647c !important;
+}
+.innerContent{
+  margin-top: 0 !important;
 }

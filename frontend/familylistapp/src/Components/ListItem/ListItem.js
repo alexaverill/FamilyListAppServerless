@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Col, Row, Form, Button } from 'react-bootstrap';
+import './ListItem.css'
 export default function ListItem({name,cost,comments,claimed,editable,editCallback,deleteCallback}){
     const handleClaim = ()=>{}
 
@@ -15,7 +16,7 @@ export default function ListItem({name,cost,comments,claimed,editable,editCallba
     
     return (
         <>
-            <Row className={`listRow` } >
+            <Row className='listrow' >
                 <Col xs="8" md="4" lg="3">
                     {name}
                 </Col>

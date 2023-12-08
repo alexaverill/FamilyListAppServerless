@@ -19,7 +19,7 @@ const LoadEvents = async()=>{
 }
     return (
 
-        <Container className="innerContent">
+        <>
         <div className="homeHeader">
             <div className="headerText">
                 <h2>Events</h2>
@@ -30,6 +30,6 @@ const LoadEvents = async()=>{
             {
             events?.map(event=> <EventCard title={event.name} date={event.date} url={'event/'+event.eventId}image={'event_images/1.jpg'}/>)}
         </Row>
-        </Container>
+        </>
     );
 }

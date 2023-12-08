@@ -5,9 +5,11 @@ import { GetEvent } from '../../API/EventAPI';
 import { Link, useParams } from 'react-router-dom';
 import {fetchAuthSession } from 'aws-amplify/auth';
 import CreateList from '../CreateList/CreateList';
+import './EventView.css'
 export default function EventView(){
     const {id} = useParams();
    const [event, setEvents] = useState([]);
+   const [date,setDate] = useState();
 useEffect(()=>{
     LoadEvent(id);
     
@@ -18,6 +20,8 @@ const LoadEvent = async(id)=>{
     let data = await GetEvent(id,token.tokens?.accessToken.toString());
     if(data){
     setEvents(data[0]);
+    let date = new Date(data[0].date);
+    setDate(date);
     console.log(data);
     }
 }
@@ -33,7 +37,7 @@ const lists = event.giving?.map((user)=>{
     //     button = 'btn btn-outline-primary fullWidthBtn claimBtn';
     // } 
     if(user.hasItems){
-    return <Row className="listRow ">
+    return <Row className="listRow">
         <Col sm="4" md="10" lg="10"><div className="userName">{user.username}</div></Col>
         <Col><a href={claimURL} className={button}>{text}</a></Col>
 
@@ -47,17 +51,17 @@ let btnClasses = "header-btn btn btn-primary fullWidthBtn";
 let url = document.URL+"/create";
     return (
 
-            <Container className="innerContent">
+            <>
                 <Row> <Link href="/">
                 <a className="backlink"> &lsaquo;&lsaquo; Return to All Events</a></Link> </Row> 
             <div className="header-column">
                 <div className="headerText">
                     <h2>{event.name}</h2>
                 </div>
-                <div className="header-date">{event.date}</div>
+                <div className="header-date">{date?.toDateString()}</div>
                 <Row className="headerRow">
                     <Col sm={10} className="headerCol">
-                    <a href={url} className={btnClasses}>{btnText}</a>;
+                    <a href={url} className={btnClasses}>{btnText}</a>
                      </Col>
                 
                 </Row>
@@ -66,6 +70,6 @@ let url = document.URL+"/create";
             
             
             {lists}
-            </Container>
+            </>
     );
 }

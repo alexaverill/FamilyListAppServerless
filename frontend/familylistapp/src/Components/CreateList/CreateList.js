@@ -19,7 +19,7 @@ export default function CreateList({eventName,url,eventId}){
     }
     let emailText = ""
     return (
-        <Container className="innerContent">
+        <>
         <Row> <Link href={url}>
             <a className="backlink"> &lsaquo;&lsaquo; Return to {eventName}</a></Link> </Row>
         <Row className="centered"><h1>Create Your Wishlist for {eventName}</h1></Row>
@@ -31,6 +31,6 @@ export default function CreateList({eventName,url,eventId}){
         <hr></hr>
         <Button onClick={handleAdd}>Add A New Item</Button>
 
-    </Container>
+    </>
     )
 }
