@@ -9,6 +9,26 @@
   -moz-box-shadow: 0px 0px 3px 0px rgba(90,155,169,1);
   box-shadow: 0px 0px 3px 0px rgba(90,155,169,1);
 }
-.claimBtn{
-    color:red;
-}
+.claimBtn {
+    width:100%;
+    color:#fff !important;
+    background-color:#1baf2f !important;
+    border-color:#1baf2f !important;
+    font-weight:700
+  }
+  .claimBtn:hover {
+    background-color:#158724 !important;
+    border-color:#158724 !important;
+  }
+  .unclaimBtn {
+    width:100%;
+    color:#952424 !important;
+    background-color:#f8fff2 !important;
+    border-color:#f8fff2 !important;
+    font-weight:700
+  }
+  .unclaimBtn:hover {
+    background-color:#d8e0d0 !important;
+    border-color:#d8e0d0 !important;
+    color:#00647c !important;
+  }
