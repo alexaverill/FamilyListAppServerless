@@ -1,10 +1,11 @@
 import { useState } from "react"
 import {Row,Container,Button} from 'react-bootstrap';
-import {Link, useParams } from 'react-router-dom';
+import {Link, useParams, useLocation } from 'react-router-dom';
 import CreateListItem from "./CreateListItem";
 
-export default function CreateList({eventName,url,eventId}){
+export default function CreateList({url,eventId}){
     const {id} = useParams();
+    const location = useLocation();
     const [emailSent,setEmailSent] = useState(false);
     const [items, setItems] = useState([]);
     const sendReminder = ()=>{}
@@ -18,6 +19,7 @@ export default function CreateList({eventName,url,eventId}){
         setItems([...newItems])
     }
     let emailText = ""
+    let eventName = location.state?.eventName;
     return (
         <>
         <Row> <Link to=".." relative="path">

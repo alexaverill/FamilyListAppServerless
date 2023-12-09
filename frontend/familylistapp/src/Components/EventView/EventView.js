@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import EventCard from '../EventCard/EventCard';
 import { Button, Container, Row, Col } from 'react-bootstrap';
 import { GetEvent } from '../../API/EventAPI';
@@ -6,11 +6,13 @@ import { Link, useParams } from 'react-router-dom';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import CreateList from '../CreateList/CreateList';
 import './EventView.css'
+import { UserContext } from '../UserContext/UserContext';
 export default function EventView() {
     const { id } = useParams();
     const [event, setEvents] = useState([]);
     const [date, setDate] = useState();
     const [userId,setUserId] = useState();
+    //const {user,token} = useContext(UserContext)
     useEffect(() => {
         LoadEvent(id);
 
@@ -28,7 +30,7 @@ export default function EventView() {
         }
     }
     const hasList = event.giving?.find(user=> user.userId = userId);
-    const lists = event.giving?.map((user) => {
+    const lists = event.recieving?.map((user) => {
         let claimURL = document.URL + `/${user.userId}`;
         let text = 'View List';
 

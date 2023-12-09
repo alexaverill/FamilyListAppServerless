@@ -11,10 +11,12 @@ import Admin from './Components/Admin/Admin';
 import CreateList from './Components/CreateList/CreateList';
 import AuthRoute from './Components/Auth/Auth';
 import ViewList from './Components/ViewList/ViewList';
+import { UserContext,UserContextProvider } from './Components/UserContext/UserContext';
 function App() {
 
   return (
     <>
+      <UserContextProvider>
       <Navigation />
       <Container className="innerContent">
         <Routes>
@@ -31,6 +33,7 @@ function App() {
         </Routes>
 
       </Container>
+      </UserContextProvider>
     </>
 
   );

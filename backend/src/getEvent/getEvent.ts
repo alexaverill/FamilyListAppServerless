@@ -32,18 +32,18 @@ export const handler: Handler = async (event, context) => {
     });
     //check if we have lists 
     for(let event of items){
-      for(let giver of event.giving){
+      for(let reciever of event.recieving){
         const checkListExistsCommand = new QueryCommand({
           TableName:"ListItems",
           IndexName:"userIdIndex",
           KeyConditionExpression:"eventId=:e and userId=:u",
         ExpressionAttributeValues: {
-            ':u': {S:`${giver.userId}`},
+            ':u': {S:`${reciever.userId}`},
             ':e': {S:`${event.eventId}`}
            }
         });
         const hasItems = await docClient.send(checkListExistsCommand);
-        giver.hasItems = hasItems.Items?.length>0;
+        reciever.hasItems = hasItems.Items?.length>0;
       }
     }
     return {

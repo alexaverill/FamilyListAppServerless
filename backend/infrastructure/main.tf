@@ -17,14 +17,7 @@ data "aws_caller_identity" "current" {}
 locals {
     account_id = data.aws_caller_identity.current.account_id
 }
-module "create_list_lambda" {
-  source = "./lambda_module"
-  source_path = "../${path.module}/src/createlist/dist"
-  output_path = "${path.module}/createllist.zip"
-  lambda_name = "create-list"
-  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
-  handler_path = "handler.handler"
-}
+
 module "get_list_lambda" {
   source = "./lambda_module"
   source_path =  "../${path.module}/src/getlist/dist"
@@ -41,6 +34,22 @@ module "create_items" {
   lambda_name = "create-items"
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
   handler_path = "createItems.handler"
+}
+module "claim_item" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/claimItems/dist"
+  output_path = "${path.module}/claimItems.zip"
+  lambda_name = "claim-item"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "claimItem.handler"
+}
+module "unclaim_item" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/unclaimItem/dist"
+  output_path = "${path.module}/unclaimItem.zip"
+  lambda_name = "unclaim-item"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "unclaimItem.handler"
 }
 module "create_event" {
   source = "./lambda_module"
@@ -230,7 +239,7 @@ resource "aws_apigatewayv2_api" "familylistapp_gateway" {
   protocol_type = "HTTP"
   cors_configuration {
     allow_origins = ["*"]
-    allow_methods = ["POST", "GET", "OPTIONS"]
+    allow_methods = ["POST", "GET", "DELETE","OPTIONS"]
     allow_headers = ["content-type","authorization"]
     max_age = 300
   }
@@ -313,20 +322,6 @@ module "get_list_api" {
   gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
 
-module "create_list_api" {
-  permission_name = "create-list"
-  source = "./api_endpoint_module"
-  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
-  route="create-list"
-  method="POST"
-  lambda_arn = module.create_list_lambda.invoke_arn
-  lambda_function_name = module.create_list_lambda.lambda_function_name
-  region = var.region
-  account_id = local.account_id
-  auth_type = "JWT"
-  authorizer_id = aws_apigatewayv2_authorizer.auth.id
-  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
-}
 module "create_items_api" {
   permission_name = "create-items"
   source = "./api_endpoint_module"
@@ -335,6 +330,34 @@ module "create_items_api" {
   method="POST"
   lambda_arn = module.create_items.invoke_arn
   lambda_function_name = module.create_items.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
+}
+module "claim_item_api" {
+  permission_name = "claim-items"
+  source = "./api_endpoint_module"
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
+  route="claim-item"
+  method="POST"
+  lambda_arn = module.claim_item.invoke_arn
+  lambda_function_name = module.claim_item.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
+}
+module "unclaim_item_api" {
+  permission_name = "claim-items"
+  source = "./api_endpoint_module"
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
+  route="unclaim-item"
+  method="DELETE"
+  lambda_arn = module.unclaim_item.invoke_arn
+  lambda_function_name = module.unclaim_item.lambda_function_name
   region = var.region
   account_id = local.account_id
   auth_type = "JWT"

@@ -1,17 +1,34 @@
-import { useState } from "react"
+import { useState,useContext, useEffect } from "react"
 import { Col, Row, Form, Button } from 'react-bootstrap';
 import './ListItem.css'
-export default function ListItem({name,cost,comments,claimed,editable,editCallback,deleteCallback}){
-    const handleClaim = ()=>{}
-
+import { UserContext } from "../UserContext/UserContext";
+export default function ListItem({id,name,cost,comments,claimed,editable,editCallback,deleteCallback,claimCallback,unclaimCallback}){
+    const {user}=useContext(UserContext);
+    const handleClaim = ()=>{
+        claimCallback(id);
+    }
+    const handleUnclaim=()=>{
+       unclaimCallback(id);
+    }
     let deleteBtn = false;
     let claimedText = "";
-    let button=""
+    let button="";
     if(editable){
         button = <Button variant="outline-primary" className="claimBtn" onClick={editCallback}> Edit </Button>
         deleteBtn = <Button variant="outline-danger"  onClick={deleteCallback}> Delete </Button>
-    }else if(!claimed){
+    }else if(claimed === null || claimed === undefined){
         button = <Button  className="claimBtn" onClick={handleClaim}> Claim </Button>
+    }else if(claimed){
+        
+        if( claimed.userId == user.userId){
+            //bgClass=styles.listRowclaimed;
+            //linkClass= styles.whitelink;
+            claimedText = "Claimed by: You";
+            button=<Button variant="outline-primary" className="unclaimBtn" onClick={handleUnclaim}> Unclaim </Button>;
+        }else{
+            //bgClass=styles.listRowClaimedOthers;
+            claimedText=`Claimed by: ${claimed.username}`
+        }
     }
     
     return (
