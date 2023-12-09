@@ -36,7 +36,7 @@ export default function EventView() {
             claimURL=document.URL + "/create"
             text = 'Edit Your List';
             button = 'btn btn-outline-primary fullWidthBtn claimBtn';
-            hasList = true;s
+            hasList = true;
         } 
         if (recieveUser.hasItems) {
             return <Row className="listRow">
