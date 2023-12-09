@@ -1,12 +1,4 @@
-.header-column{
-    display:flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 3%;
-}
-.fullWidthBtn{
-    min-width: 10rem;
-}
+
 .listRow{
     background-color: white;
     padding: 0.75%;

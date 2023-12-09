@@ -8,6 +8,7 @@
   -webkit-box-shadow: 0px 0px 3px 0px rgba(90,155,169,1);
   -moz-box-shadow: 0px 0px 3px 0px rgba(90,155,169,1);
   box-shadow: 0px 0px 3px 0px rgba(90,155,169,1);
+  align-items: center;
 }
 .claimBtn {
     width:100%;
@@ -31,4 +32,21 @@
     background-color:#d8e0d0 !important;
     border-color:#d8e0d0 !important;
     color:#00647c !important;
+  }
+
+  .listRowclaimed{
+    background-color: #00647c !important;
+    color:white !important;
+    font-weight: bold !important;
+  }
+  .whitelink{
+    
+    color:white;
+    font-weight: bold;
+  }
+  .claimSection{
+    flex-direction: column;
+  }
+  .listRowClaimedOthers{
+    background-color: #e8e8e8;
   }

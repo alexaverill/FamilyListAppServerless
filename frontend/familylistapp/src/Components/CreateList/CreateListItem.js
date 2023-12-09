@@ -5,27 +5,26 @@ import { Link, useParams } from 'react-router-dom';
 import { fetchAuthSession } from "aws-amplify/auth";
 import { CreateItem } from "../../API/ListItemApi";
 
-export default function CreateListItem({index,deleteCallback,eventId}) {
-    const [itemId,setItemId] = useState('');
-    const [name, setName] = useState('');
-    const [cost, setCost] = useState('');
-    const [url, setUrl] = useState('');
-    const [comments, setComments] = useState('');
-    const [editng,setEditing] = useState(true);
+export default function CreateListItem({index,deleteCallback,eventId,id,name,cost,url,comments,editing}) {
+    const [itemId,setItemId] = useState(id);
+    const [itemName, setName] = useState(name);
+    const [itemCost, setCost] = useState(cost);
+    const [itemURL, setUrl] = useState(url);
+    const [itemComments, setComments] = useState(comments);
+    const [isEditing,setEditing] = useState(editing);
     const handleSubmit = async (event) => { 
         event.preventDefault();
         setEditing(false);
         let userData = await fetchAuthSession();
         let itemData = {
             itemId,
-            name,
-            cost,
-            url,
-            comments,
+            name:itemName,
+            cost:itemCost,
+            url:itemURL,
+            comments:itemComments,
             userId:userData.userSub,
             eventId
         };
-        console.log(itemData);
         let token = await fetchAuthSession();
         let result = await CreateItem(itemData,token.tokens?.accessToken.toString())
         if(result){
@@ -33,12 +32,13 @@ export default function CreateListItem({index,deleteCallback,eventId}) {
         }
     }
     const handleDelete = ()=>{
-        deleteCallback(index);
+
+        deleteCallback(itemId);
     }
     const handleEdit = ()=>{
         setEditing(true);
     }
-    if(editng){
+    if(isEditing){
     return (
         <Row lg={1} md={1} sm={1} xl={1} xs={1}>
             <Form onSubmit={handleSubmit} className="list-edit">
@@ -46,7 +46,7 @@ export default function CreateListItem({index,deleteCallback,eventId}) {
                     <Col md={8}>
                         <Form.Group controlId="itemName" className="form-group-right-spacing">
                             <Form.Label>Item Name</Form.Label>
-                            <Form.Control type="text" name="name" value={name} required maxLength="100" onChange={(e) => setName(e.target.value)} />
+                            <Form.Control type="text" name="name" value={itemName} required maxLength="100" onChange={(e) => setName(e.target.value)} />
                             <Form.Control.Feedback type="invalid">
                                 Please enter the name of the item.
                             </Form.Control.Feedback>
@@ -57,7 +57,7 @@ export default function CreateListItem({index,deleteCallback,eventId}) {
                             <Form.Label>Cost</Form.Label>
                             <InputGroup>
                                 <InputGroup.Text>$</InputGroup.Text>
-                                <Form.Control name="cost" type="number" min="0" value={cost} step="any" onChange={(e) => setCost(e.target.value)} />
+                                <Form.Control name="cost" type="number" min="0" value={itemCost} step="any" onChange={(e) => setCost(e.target.value)} />
                                 <Form.Control.Feedback type="invalid">
                                     Please enter the item cost. If there is no cost, enter 0.
                                 </Form.Control.Feedback>
@@ -70,7 +70,7 @@ export default function CreateListItem({index,deleteCallback,eventId}) {
                     <Col md={12}>
                         <Form.Group controlId="url" >
                             <Form.Label>Item URL</Form.Label>
-                            <Form.Control name="url" type="text" onChange={(e) => setUrl(e.target.value)} value={url} maxLength="255" />
+                            <Form.Control name="url" type="text" onChange={(e) => setUrl(e.target.value)} value={itemURL} maxLength="255" />
                         </Form.Group>
                     </Col>
                 </Row>
@@ -79,7 +79,7 @@ export default function CreateListItem({index,deleteCallback,eventId}) {
                     <Col md={12}>
                         <Form.Group controlId="comments" >
                             <Form.Label>Comments</Form.Label>
-                            <Form.Control name="comments" type="text" onChange={(e) => setComments(e.target.value)} value={comments} maxLength="255" />
+                            <Form.Control name="comments" type="text" onChange={(e) => setComments(e.target.value)} value={itemComments} maxLength="255" />
                         </Form.Group>
                     </Col>
                 </Row>
@@ -95,10 +95,10 @@ export default function CreateListItem({index,deleteCallback,eventId}) {
     return (
         <Row lg={1} md={1} sm={1} xl={1} xs={1}>
         <ListItem 
-            name={name} 
-            cost={cost} 
-            url ={url} 
-            comments={comments} 
+            name={itemName} 
+            cost={itemCost} 
+            url ={itemURL} 
+            comments={itemComments} 
             editable={true} 
             editCallback={handleEdit}
             deleteCallback={handleDelete}

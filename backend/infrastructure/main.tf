@@ -35,6 +35,14 @@ module "create_items" {
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
   handler_path = "createItems.handler"
 }
+module "delete_item" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/deleteItem/dist"
+  output_path = "${path.module}/deleteItem.zip"
+  lambda_name = "delete-item"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "deleteItem.handler"
+}
 module "claim_item" {
   source = "./lambda_module"
   source_path =  "../${path.module}/src/claimItems/dist"
@@ -330,6 +338,20 @@ module "create_items_api" {
   method="POST"
   lambda_arn = module.create_items.invoke_arn
   lambda_function_name = module.create_items.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
+}
+module "delete_item_api" {
+  permission_name = "delete-item"
+  source = "./api_endpoint_module"
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
+  route="delete-item"
+  method="DELETE"
+  lambda_arn = module.delete_item.invoke_arn
+  lambda_function_name = module.delete_item.lambda_function_name
   region = var.region
   account_id = local.account_id
   auth_type = "JWT"

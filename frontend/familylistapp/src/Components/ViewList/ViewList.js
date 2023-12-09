@@ -61,7 +61,9 @@ export default function ViewList() {
     return (
         <Container className="innerContent">
             <Row> <Link to=".." relative="path"><a className="backlink"> &lsaquo;&lsaquo; Return to {eventName}</a></Link> </Row>
-            <Row className="centered"><h1>{username}'s Wishlist</h1></Row>
+            <Col className="header-column">
+            <Row className="headerText"><h1>{username}'s Wishlist</h1></Row>
+            </Col>
             {list}
 
         </Container>)

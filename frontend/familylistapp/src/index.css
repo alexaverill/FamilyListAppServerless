@@ -39,3 +39,12 @@ code {
 .innerContent{
   margin-top: 0 !important;
 }
+.header-column{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 3%;
+}
+.fullWidthBtn{
+  min-width: 10rem;
+}

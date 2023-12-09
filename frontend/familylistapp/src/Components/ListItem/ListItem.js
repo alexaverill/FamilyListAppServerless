@@ -13,27 +13,28 @@ export default function ListItem({id,name,cost,comments,claimed,editable,editCal
     let deleteBtn = false;
     let claimedText = "";
     let button="";
+    let bgClass="";
     if(editable){
         button = <Button variant="outline-primary" className="claimBtn" onClick={editCallback}> Edit </Button>
-        deleteBtn = <Button variant="outline-danger"  onClick={deleteCallback}> Delete </Button>
+        deleteBtn = <Button variant="outline-danger"  onClick={()=>deleteCallback(id)}> Delete </Button>
     }else if(claimed === null || claimed === undefined){
         button = <Button  className="claimBtn" onClick={handleClaim}> Claim </Button>
     }else if(claimed){
         
         if( claimed.userId == user.userId){
-            //bgClass=styles.listRowclaimed;
+            bgClass="listRowclaimed";
             //linkClass= styles.whitelink;
             claimedText = "Claimed by: You";
             button=<Button variant="outline-primary" className="unclaimBtn" onClick={handleUnclaim}> Unclaim </Button>;
         }else{
-            //bgClass=styles.listRowClaimedOthers;
+            bgClass="listRowClaimedOthers";
             claimedText=`Claimed by: ${claimed.username}`
         }
     }
     
     return (
         <>
-            <Row className='listrow' >
+            <Row className={`listrow ${bgClass}`} >
                 <Col xs="8" md="4" lg="3">
                     {name}
                 </Col>

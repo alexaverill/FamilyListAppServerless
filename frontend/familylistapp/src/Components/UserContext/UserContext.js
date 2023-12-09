@@ -11,8 +11,8 @@ export const UserContextProvider = ({children}) =>{
    const getUserAndSession = async () =>{
     let user = await getCurrentUser();
     let session = await fetchAuthSession();
-    console.log(session);
     let token = session.tokens?.accessToken;
+    console.log(user);
     setData({user,token})
 
    }

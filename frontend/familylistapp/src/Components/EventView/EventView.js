@@ -44,7 +44,7 @@ export default function EventView() {
         if (user.hasItems) {
             return <Row className="listRow">
                 <Col sm="4" md="10" lg="10"><div className="userName">{user.username}</div></Col>
-                <Col><a href={claimURL} className={button}>{text}</a></Col>
+                <Col><Link to={claimURL} state={{eventName:event.name,username:user.username}} className={button}>{text}</Link></Col>
 
             </Row>
         }

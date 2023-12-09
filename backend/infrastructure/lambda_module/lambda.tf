@@ -96,7 +96,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda"{
                 "dynamodb:PutItem",
                 "dynamodb:Query",
                 "dynamodb:Scan",
-                "dynamodb:UpdateItem"
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem"
             ],
             "Effect": "Allow",
             "Resource": "arn:aws:dynamodb:us-west-2:*"
