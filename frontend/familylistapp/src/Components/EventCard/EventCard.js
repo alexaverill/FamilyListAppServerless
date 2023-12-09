@@ -1,7 +1,6 @@
 import Card from 'react-bootstrap/Card';
 import './EventCard.css'
 export default function EventCard({ eventId, image, date, title, url }) {
-    console.log(image);
     const options = {
         year: 'numeric',
         month: 'long',
@@ -15,7 +14,6 @@ export default function EventCard({ eventId, image, date, title, url }) {
             <Card.Body>
                 <Card.Title>{title}</Card.Title>
                 <Card.Subtitle>{dateString}</Card.Subtitle>
-
                 <a href={url} className="btn btn-primary">View Event</a>
             </Card.Body>
         </Card>);

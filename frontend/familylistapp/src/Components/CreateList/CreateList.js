@@ -17,7 +17,6 @@ export default function CreateList({url,eventId}){
     },[user])
     const loadList =async ()=>{
         let data = await GetList(id,user.userId);
-        console.log(data);
         let displayItems = data.map((item)=>{
             return <CreateListItem key={item.itemId} id={item.itemId} name={item.name}
             cost={item.cost} url={item.url}

@@ -25,7 +25,7 @@ export default function EventView() {
         }
         setIsLoading(false);
     }
-    const hasList = false;
+    let hasList = false;
     const lists = event.recieving?.map((recieveUser) => {
         let claimURL = document.URL + `/${user.userId}`;
         let text = 'View List';

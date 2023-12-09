@@ -13,7 +13,7 @@ export async function genericApiCall(url,method,data){
           },
       
           mode: "cors",
-        }).then(response => response.json()).then(data => { console.log(data); return data; }).catch(err => {
+        }).then(response => response.json()).then(data => data).catch(err => {
           console.log(err.message);
           return;
         });
