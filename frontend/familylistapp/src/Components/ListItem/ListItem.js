@@ -2,13 +2,47 @@ import { useState,useContext, useEffect } from "react"
 import { Col, Row, Form, Button } from 'react-bootstrap';
 import './ListItem.css'
 import { UserContext } from "../UserContext/UserContext";
-export default function ListItem({id,name,cost,comments,claimed,editable,editCallback,deleteCallback,claimCallback,unclaimCallback}){
+import LoadingButton from "../LoadingButton/LoadingButton";
+import { ClaimItem, GetList, UnClaimItem } from "../../API/ListItemApi";
+export default function ListItem({id,name,cost,comments,itemClaimed,editable,editCallback,deleteCallback,claimCallback,unclaimCallback,eventId}){
     const {user}=useContext(UserContext);
-    const handleClaim = ()=>{
-        claimCallback(id);
+    const [isLoading, setLoading] = useState(false);
+    const [claimed,setClaimed] = useState(itemClaimed);
+    const handleClaim = async ()=>{
+        console.log(isLoading);
+        setLoading(true);
+        var eventObject = {
+            eventId:eventId,
+            username:user.username,
+            userId:user.userId,
+            itemId:id
+
+        };
+        console.log(user);
+        console.log(eventObject);
+        let data = await ClaimItem(eventObject);
+        console.log(data);
+        if(data){
+            console.log(data);
+            setClaimed(data.claimed);
+        }
+        setLoading(false);
     }
-    const handleUnclaim=()=>{
-       unclaimCallback(id);
+    const handleUnclaim = async ()=>{
+        setLoading(true);
+        var eventObject = {
+            eventId:eventId,
+            username:user.username,
+            userId:user.userId,
+            itemId:id
+
+        };
+        let data = await UnClaimItem(eventObject);
+        if(data){
+            setClaimed(undefined);
+        }
+        setLoading(false);
+
     }
     let deleteBtn = false;
     let claimedText = "";
@@ -18,14 +52,14 @@ export default function ListItem({id,name,cost,comments,claimed,editable,editCal
         button = <Button variant="outline-primary" className="claimBtn" onClick={editCallback}> Edit </Button>
         deleteBtn = <Button variant="outline-danger"  onClick={()=>deleteCallback(id)}> Delete </Button>
     }else if(claimed === null || claimed === undefined){
-        button = <Button  className="claimBtn" onClick={handleClaim}> Claim </Button>
+        button = <LoadingButton isloading={isLoading}  className="claimBtn" onClick={handleClaim}> {isLoading? 'Claiming':'Claim'} </LoadingButton>
     }else if(claimed){
         
         if( claimed.userId == user.userId){
             bgClass="listRowclaimed";
             //linkClass= styles.whitelink;
             claimedText = "Claimed by: You";
-            button=<Button variant="outline-primary" className="unclaimBtn" onClick={handleUnclaim}> Unclaim </Button>;
+            button=<LoadingButton variant="outline-primary" className="unclaimBtn" onClick={handleUnclaim}> Unclaim </LoadingButton>;
         }else{
             bgClass="listRowClaimedOthers";
             claimedText=`Claimed by: ${claimed.username}`

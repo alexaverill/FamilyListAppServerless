@@ -1,58 +1,17 @@
-export async function GetEvents(token) {
-  let url = process.env.REACT_APP_API_URL + '/get-events'
-  return await fetch(url, {
-    method: "GET", // POST, PUT, DELETE, etc.
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      "Content-Type": "text/plain;charset=UTF-8",
-    },
-
-    mode: "cors",
-  }).then(response => response.json()).then(data => { console.log(data); return data; }).catch(err => {
-    console.log(err.message);
-    return;
-  });
+import {genericApiCall,EventsByUser} from "./BaseApi";
+import { fetchAuthSession } from "aws-amplify/auth";
+export async function GetEvents() {
+  let url = '/get-events'
+  return await genericApiCall(url,"GET",null);
 }
-export async function GetEventsByUser(userId,token){
-  let url = process.env.REACT_APP_API_URL + '/get-events/'+userId
-  return await fetch(url, {
-    method: "GET", // POST, PUT, DELETE, etc.
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      "Content-Type": "application/json",
-    },
-    mode: "cors",
-  }).then(response => response.json()).then(data => { console.log(data); return data; }).catch(err => {
-    console.log(err.message);
-    return;
-  });
+export async function GetEventsByUser(userId){
+  return await EventsByUser();
 }
-export async function CreateEvent(eventObject,token){
-  await fetch(process.env.REACT_APP_API_URL+'/create-events', {
-  method: 'POST',
-  headers:{
-   'Authorization':`Bearer ${token}`,
-   "Content-Type": "application/json",
-  },
-  body: JSON.stringify(eventObject),
-  })
-  .then((response) => response.json())
-  .catch((err) => {
-     console.log(err.message);
-  });        
+export async function CreateEvent(eventObject){
+  let url = '/create-events'
+  return await genericApiCall(url,"POST",eventObject);      
 }
-export async function GetEvent(eventId,token) {
-  let url = process.env.REACT_APP_API_URL + '/get-event/'+eventId
-  return await fetch(url, {
-    method: "GET", // POST, PUT, DELETE, etc.
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      "Content-Type": "=application/json",
-    },
-
-    mode: "cors",
-  }).then(response => response.json()).then(data => { console.log(data); return data; }).catch(err => {
-    console.log(err.message);
-    return;
-  });
+export async function GetEvent(eventId) {
+  let url = '/get-event/'+eventId
+  return await genericApiCall(url,"GET",null);
 }

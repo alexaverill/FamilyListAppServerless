@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Form, Col, Row, Button } from 'react-bootstrap';
+import { Form, Col, Row, Button,Spinner } from 'react-bootstrap';
 import { CreateEvent } from '../../API/EventAPI';
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { GetUsers } from '../../API/UserAPI';
+import LoadingButton from '../LoadingButton/LoadingButton';
 var _array = require('lodash/array');
 
 export default function CreateEventForm() {
@@ -12,9 +13,7 @@ export default function CreateEventForm() {
         loadUsers();
     }, []);
     const loadUsers = async () => {
-        var token = await fetchAuthSession();
-        let data = await GetUsers(token.tokens?.accessToken.toString());
-        console.log(data);
+        let data = await GetUsers();
         if (data) {
             setUsers(data);
         }
@@ -24,10 +23,16 @@ export default function CreateEventForm() {
     const [giving, setGiving] = useState([]);
     const [recieving, setRecieving] = useState([]);
     const today = new Date().toISOString().split('T')[0];
-
+    const [isLoading,setIsLoading] = useState(false);
     let items = () => {
-        //checked={this.state.givingStatus[index] || false}/
-        //className={styles.userRow}
+        if (users.length<=0){
+            return (<Spinner
+                as="span"
+                animation="border"
+                role="status"
+                aria-hidden="true"
+            />);
+        }
         return users.map((u, index) => {
 
             let result = <Form.Group controlId="formBasicCheckbox" as={Row} key={u.userId}>
@@ -61,11 +66,18 @@ export default function CreateEventForm() {
     }
     const handleSubmit = async (e) => {
         e.preventDefault();
-        var token = await fetchAuthSession();
+        setIsLoading(true);
         var eventObject = {name,date,giving,recieving}
-        console.log(token.tokens.accessToken.toString());
-        CreateEvent(eventObject, token.tokens?.accessToken.toString());
+        CreateEvent(eventObject);
         console.log(e);
+        setIsLoading(false);
+        resetForm();
+    }
+    const resetForm = ()=>{
+        setName();
+        setDate();
+        setGiving([]);
+        setRecieving([]);
     }
     const checkAll = (event,array,func)=>{
         let checked = event.target.checked;
@@ -120,9 +132,9 @@ export default function CreateEventForm() {
                 {false ? <Row><Col>At least one person needs to give gifts.</Col></Row> : <></>}
                 {false ? <Row><Col>At least one person needs to receive gifts.</Col></Row> : <></>}
 
-                <Button variant="primary" type="submit">
+                <LoadingButton isloading={isLoading} variant="primary" type="submit">
                     Create Event
-                </Button>
+                </LoadingButton>
             </Form>
         </>
     )

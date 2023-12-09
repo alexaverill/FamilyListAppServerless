@@ -3,7 +3,6 @@ import { Button, Container, Row, Col } from 'react-bootstrap';
 import ListItem from "../ListItem/ListItem";
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ClaimItem, GetList, UnClaimItem } from "../../API/ListItemApi";
-import { fetchAuthSession } from 'aws-amplify/auth';
 import { UserContext } from "../UserContext/UserContext";
 export default function ViewList() {
     const location = useLocation();
@@ -12,51 +11,23 @@ export default function ViewList() {
     const { id, userid } = useParams();
     const [items, setItems] = useState([])
     const {user,token}=useContext(UserContext);
-    
+    const {isLoading,setLoading}= useState(false);
     useEffect(() => {
         LoadList(id, userid);
         console.log(UserContext);
     }, [id])
     const LoadList = async (eventId, userId) => {
-        console.log(token.toString());
-        let t = await fetchAuthSession();
-        let data = await GetList(id, userid, t.tokens.accessToken.toString());
+        let data = await GetList(id, userid);
         if (data) {
             setItems(data);
         }
     }
-    const handleClaim = async (itemId)=>{
-        console.log(token);
-        let t = await fetchAuthSession();
-        var eventObject = {
-            eventId:id,
-            username:user.username,
-            userId:t.userSub,
-            itemId:itemId
 
-        };
-        let data = await ClaimItem(eventObject,token.toString());
-        items.splice(items.findIndex((item)=>item.itemId===data.itemId),1);
-        setItems([...items,data]);
-    }
-    const handleUnclaim = async (itemId)=>{
-        let t = await fetchAuthSession();
-        var eventObject = {
-            eventId:id,
-            username:user.username,
-            userId:t.userSub,
-            itemId:itemId
-
-        };
-        let data = await UnClaimItem(eventObject,token.toString());
-        items.splice(items.findIndex((item)=>item.itemId===data.itemId),1);
-        setItems([...items,data]);
-    }
     const list = items?.map((item) => {
         return <ListItem id={item.itemId} name={item.name}
             cost={item.price} url={item.url}
             comments={item.comments}
-            claimed={item.claimed} claimCallback={handleClaim} unclaimCallback={handleUnclaim} />
+            itemClaimed={item.claimed}  eventId={id}/>
     });
     return (
         <Container className="innerContent">

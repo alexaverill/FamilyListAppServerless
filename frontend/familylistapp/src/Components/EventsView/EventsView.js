@@ -1,35 +1,46 @@
 import { useEffect, useState } from 'react';
 import EventCard from '../EventCard/EventCard';
 import './EventsView.css'
-import { Container,Row } from 'react-bootstrap';
+import { Container, Row, Spinner } from 'react-bootstrap';
 import { GetEvents, GetEventsByUser } from '../../API/EventAPI';
-import {fetchAuthSession } from 'aws-amplify/auth';
-export default function EventsView(){
-   const [events, setEvents] = useState([]);
-useEffect(()=>{
-    LoadEvents();
-},[])
-const LoadEvents = async()=>{
-    var token = await fetchAuthSession();
-    let data = await GetEventsByUser(token.userSub,token.tokens?.accessToken.toString());
-    if(data){
-        console.log(data);
-        setEvents(data);
+import { fetchAuthSession } from 'aws-amplify/auth';
+export default function EventsView() {
+    const [events, setEvents] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    useEffect(() => {
+        LoadEvents();
+    }, [])
+
+    const LoadEvents = async () => {
+        setIsLoading(true);
+        let data = await GetEventsByUser();
+        if (data) {
+            data.sort((first,second)=>{
+                var dateOne = new Date(first.date);
+                var dateTwo = new Date(second.date);
+                return dateOne - dateTwo;
+            });
+            setEvents(data);
+        }
+        setIsLoading(false);
     }
-}
     return (
 
         <>
-        <div className="homeHeader">
-            <div className="headerText">
-                <h2>Events</h2>
+            <div className="homeHeader">
+                <div className="headerText">
+                    <h2>Events</h2>
+                </div>
+
             </div>
-            
-        </div>
-        <Row>
-            {
-            events?.map(event=> <EventCard title={event.name} date={event.date} url={'event/'+event.eventId}image={'event_images/1.jpg'}/>)}
-        </Row>
+            {isLoading ? <Spinner as="span"
+                animation="border"
+                role="status"
+                aria-hidden="true"
+            /> :
+                <Row>
+                    {events?.map(event => <EventCard title={event.name} date={event.date} url={'event/' + event.eventId} image={`event_images/${event.imageId ? event.imageId.toString() : '1'}.jpg`} />)}
+                </Row>}
         </>
     );
 }

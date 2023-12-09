@@ -17,6 +17,7 @@ export const handler: Handler = async (event, context) => {
     if(!parsedEvent.eventId){
       parsedEvent.eventId = randomUUID();
     }
+    parsedEvent.imageId = Math.floor(Math.random()*25);
     console.log(parsedEvent);
     try {
         const command = new PutCommand({

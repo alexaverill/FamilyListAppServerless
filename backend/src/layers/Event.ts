@@ -6,4 +6,5 @@ export class Event{
     name:string;
     giving:User[];
     recieving:User[];
+    imageId:number;
 }

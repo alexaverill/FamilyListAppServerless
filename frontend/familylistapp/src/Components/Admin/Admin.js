@@ -4,7 +4,7 @@ export default function Admin(){
     return (
         <>
         <CreateEventForm/>
-        <CreateUser/>
+        {/* <CreateUser/> */}
         </>
     )
 }

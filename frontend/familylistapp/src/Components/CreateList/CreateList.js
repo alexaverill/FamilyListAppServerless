@@ -16,8 +16,7 @@ export default function CreateList({url,eventId}){
         loadList();
     },[user])
     const loadList =async ()=>{
-        let token = await fetchAuthSession();
-        let data = await GetList(id,token.userSub,token.tokens.accessToken.toString());
+        let data = await GetList(id,user.userId);
         console.log(data);
         let displayItems = data.map((item)=>{
             return <CreateListItem key={item.itemId} id={item.itemId} name={item.name}
@@ -37,8 +36,7 @@ export default function CreateList({url,eventId}){
             itemId,
             eventId:id
         }
-        let token = await fetchAuthSession();
-        let data = await DeleteItem(eventObj,token.tokens.accessToken.toString())
+        await DeleteItem(eventObj)
         items.splice(items.findIndex((item)=>item.itemId===itemId),1);
         setItems([...items])
     }
