@@ -5,6 +5,7 @@ import CreateListItem from "./CreateListItem";
 import { DeleteItem, GetList } from "../../API/ListItemApi";
 import { UserContext } from "../UserContext/UserContext";
 import { fetchAuthSession } from "aws-amplify/auth";
+import { ShareWishlist } from "../../API/BaseApi";
 
 export default function CreateList({url,eventId}){
     const {id} = useParams();
@@ -12,6 +13,7 @@ export default function CreateList({url,eventId}){
     const [emailSent,setEmailSent] = useState(false);
     const [items, setItems] = useState([]);
     const {user,token} = useContext(UserContext);
+    console.log(location.state);
     useEffect(()=>{
         loadList();
     },[user])
@@ -25,7 +27,10 @@ export default function CreateList({url,eventId}){
         });
         setItems(displayItems);
     }
-    const sendReminder = ()=>{}
+    const sendReminder = ()=>{
+        console.log(id,user.username);
+        ShareWishlist({eventId:id,username:user.username,name:location.state?.eventName});
+    }
     const handleAdd = ()=>{
         setItems([...items,<CreateListItem index={items.length+1} deleteCallback={handleDeleted} key={items.length+1} eventId={id} editing={true}/>])
     
@@ -57,9 +62,6 @@ export default function CreateList({url,eventId}){
 
                 </Row>
             </div>
-        {/* <Row className="centered"></Row>
-        <Row className="headerRow"><div><p>{emailText}</p></div></Row>
-        <Row className="headerRow"><div>{emailSent ? <></> : <Button onClick={sendReminder}>Share Wishlist</Button>}</div></Row> */}
         <div className="item-row">
             {items}
         </div>

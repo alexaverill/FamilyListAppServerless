@@ -122,9 +122,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda"{
         {
           "Effect":"Allow",
           "Action":[
-            "cognito-idp:AdminCreateUser"
+            "ses:SendEmail"
           ]
-          "Resource":"arn:aws:cognito-idp:us-west-2:219875217854:userpool/*"
+          "Resource":"arn:aws:ses:us-west-2:219875217854:identity/*"
         }
         ]
         }

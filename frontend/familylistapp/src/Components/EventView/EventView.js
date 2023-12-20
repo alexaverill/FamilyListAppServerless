@@ -11,6 +11,7 @@ export default function EventView() {
     const {user} = useContext(UserContext);
     const [isLoading,setIsLoading] = useState(true);
     //const {user,token} = useContext(UserContext)
+    
     useEffect(() => {
         LoadEvent(id);
 
@@ -72,7 +73,7 @@ export default function EventView() {
                 <div className="header-date">{date?.toDateString()}</div>
                 <Row className="headerRow">
                     <Col sm={10} className="headerCol">
-                        <a href={url} className={btnClasses}>{btnText}</a>
+                        <Link to={url} state={{eventName:event.name,username:user.username}} className={btnClasses}>{btnText}</Link>
                     </Col>
 
                 </Row>

@@ -99,6 +99,14 @@ module "get_users" {
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
   handler_path = "getUsers.handler"
 }
+module "share_wishlist" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/shareList/dist"
+  output_path = "${path.module}/shareList.zip"
+  lambda_name = "family-list-app-share-list"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "shareList.handler"
+}
 #Dynamo setup
 resource "aws_dynamodb_table" "lists-dynamodb-table" {
   name           = "Lists"
@@ -293,27 +301,6 @@ resource "aws_apigatewayv2_authorizer" "auth" {
     issuer   = "https://${aws_cognito_user_pool.pool.endpoint}"
   }
 }
-# resource "aws_api_gateway_deployment" "api_deployment" {
-#   rest_api_id = aws_apigatewayv2_api.familylistapp_gateway.id
-#   triggers = {
-#     redeployment = "${join(",",[md5(file("api_endpoint_module/api_endpoint.tf")),md5(file("main.tf"))])}"
-#   }
-#   stage_description = "${join(",",[md5(file("api_endpoint_module/api_endpoint.tf")),md5(file("main.tf"))])}" #workaround to force a deploy to happen if the files change.
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-#   depends_on = [  
-#     module.get_lists_api,
-#     module.create_items_api,
-#     module.create_list_api,
-#     module.create_events_api,
-#      ]
-# }
-# resource "aws_api_gateway_stage" "dev" {
-#   deployment_id = aws_api_gateway_deployment.api_deployment.id
-#   rest_api_id   = aws_apigatewayv2_api.familylistapp_gateway.id
-#   stage_name    = "dev"
-# }
 
 module "get_list_api" {
   permission_name = "get-list"
@@ -457,7 +444,20 @@ module "get_users_api" {
   authorizer_id =aws_apigatewayv2_authorizer.auth.id
   gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
-
+module "share_wishlist_api" {
+  permission_name = "share-wishlist"
+  source = "./api_endpoint_module"
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
+  route="share-wishlist"
+  method="POST"
+  lambda_arn = module.share_wishlist.invoke_arn
+  lambda_function_name = module.share_wishlist.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "JWT"
+  authorizer_id =aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
+}
 
 resource "aws_cloudwatch_log_group" "api_gw" {
   name = "/aws/api_gw/${aws_apigatewayv2_api.familylistapp_gateway.name}"

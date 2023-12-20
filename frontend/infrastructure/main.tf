@@ -15,7 +15,7 @@ provider "aws" {
 
 # Create S3 Bucket
 resource "aws_s3_bucket" "familylistapp-react-bucket" {
-  bucket = "familylistapp-react-bucket"
+  bucket = "familylistapp.com"
 
   tags = {
     Name        = "FamilyListApp React App bucket"

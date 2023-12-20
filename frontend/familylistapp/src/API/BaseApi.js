@@ -53,3 +53,6 @@ export async function EventsByUser(){
       return;
     });
 }
+export async function ShareWishlist(eventObj){
+  return await genericApiCall("/share-wishlist","POST",eventObj);
+}
