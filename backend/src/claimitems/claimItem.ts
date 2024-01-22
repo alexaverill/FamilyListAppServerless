@@ -23,7 +23,7 @@ export const handler: Handler = async (event, context) => {
           itemId,
           eventId
         },
-        UpdateExpression: "set claimed = :claim",
+        UpdateExpression: "set claimed = if_not_exists(claimed,:claim)",
         ExpressionAttributeValues: {
           ":claim":claim
         },
