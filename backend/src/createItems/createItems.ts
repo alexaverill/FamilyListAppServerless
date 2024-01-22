@@ -17,6 +17,7 @@ export const handler: Handler = async (event, context) => {
     }
     if(!listItem.itemId){
       listItem.itemId = randomUUID();
+      listItem.published = false; //default to unpublished on creation.
     }
     console.log(listItem);
     try {

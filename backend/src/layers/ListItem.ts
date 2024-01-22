@@ -8,4 +8,5 @@ export class ListItem{
     public isClaimed:boolean;
     public claimedBy:string;
     public comments:string;
+    public published:boolean = true;
 }
