@@ -28,7 +28,7 @@ export default function EventView() {
     }
     let hasList = false;
     const lists = event.recieving?.map((recieveUser) => {
-        let claimURL = document.URL + `/${user.userId}`;
+        let claimURL = document.URL + `/${recieveUser.userId}`;
         let text = 'View List';
 
         let button = 'btn btn-primary fullWidthBtn fullWidth';
@@ -41,8 +41,8 @@ export default function EventView() {
         } 
         if (recieveUser.hasItems) {
             return <Row className="listRow">
-                <Col sm="4" md="10" lg="10"><div className="userName">{user.username}</div></Col>
-                <Col><Link to={claimURL} state={{eventName:event.name,username:user.username}} className={button}>{text}</Link></Col>
+                <Col sm="4" md="10" lg="10"><div className="userName">{recieveUser.username}</div></Col>
+                <Col><Link to={claimURL} state={{eventName:event.name,username:recieveUser.username}} className={button}>{text}</Link></Col>
 
             </Row>
         }
