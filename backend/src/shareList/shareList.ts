@@ -22,7 +22,7 @@ export const handler: Handler = async (event, context) => {
     let eventResponse = await docClient.send(getEventCommand);
     console.log(eventResponse);
     let givingUsers = eventResponse.Item.giving;
-    let givingEmails = givingUsers.map((user:any)=>user.email);
+    let givingEmails = givingUsers.map((user:any)=>user.email).filter((value: string) => value !== undefined);
     console.log(givingEmails);
     if(givingEmails.length <=0){
       return {
