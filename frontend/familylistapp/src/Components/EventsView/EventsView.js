@@ -39,7 +39,7 @@ export default function EventsView() {
                 aria-hidden="true"
             /> :
                 <Row>
-                    {events?.map(event => <EventCard title={event.name} date={event.date} url={'event/' + event.eventId} image={`event_images/${event.imageId ? event.imageId.toString() : '1'}.jpg`} />)}
+                    {events?.map(event => <EventCard key={event.eventId} title={event.name} date={event.date} url={'event/' + event.eventId} image={`event_images/${event.imageId ? event.imageId.toString() : '1'}.jpg`} />)}
                 </Row>}
         </>
     );

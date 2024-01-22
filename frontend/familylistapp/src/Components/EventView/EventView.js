@@ -40,7 +40,7 @@ export default function EventView() {
             hasList = true;
         } 
         if (recieveUser.hasItems) {
-            return <Row className="listRow">
+            return <Row className="listRow" key={recieveUser.userId}>
                 <Col sm="4" md="10" lg="10"><div className="userName">{recieveUser.username}</div></Col>
                 <Col><Link to={claimURL} state={{eventName:event.name,username:recieveUser.username}} className={button}>{text}</Link></Col>
 
