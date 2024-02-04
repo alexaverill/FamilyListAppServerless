@@ -21,7 +21,7 @@ export default function EventView() {
         let data = await GetEvent(id);
         if (data) {
             setEvents(data[0]);
-            let date = new Date(data[0].date);
+            let date = new Date(data[0].date.replace(/-/g, '\/'));
             setDate(date);
         }
         setIsLoading(false);
@@ -71,12 +71,13 @@ export default function EventView() {
                     <h2>{event.name}</h2>
                 </div>
                 <div className="header-date">{date?.toDateString()}</div>
+                {hasList ? 
                 <Row className="headerRow">
                     <Col sm={10} className="headerCol">
                         <Link to={url} state={{eventName:event.name,username:user.username}} className={btnClasses}>{btnText}</Link>
                     </Col>
 
-                </Row>
+                </Row>: <></>}
             </div>
 
 

@@ -6,7 +6,7 @@ export default function EventCard({ eventId, image, date, title, url }) {
         month: 'long',
         day: 'numeric',
     };
-    let d = new Date(date);
+    let d = new Date(date.replace(/-/g, '\/')); //js dates are silly
     let dateString = d.toDateString();
     return (
         <Card className='eventCard'>

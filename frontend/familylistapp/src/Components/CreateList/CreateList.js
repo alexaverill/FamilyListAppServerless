@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react"
-import {Row,Col,Button} from 'react-bootstrap';
+import {Row,Col,Button,Spinner} from 'react-bootstrap';
 import {Link, useParams, useLocation } from 'react-router-dom';
 import CreateListItem from "./CreateListItem";
 import { DeleteItem, GetList } from "../../API/ListItemApi";
 import { UserContext } from "../UserContext/UserContext";
 import { fetchAuthSession } from "aws-amplify/auth";
-import { ShareWishlist } from "../../API/BaseApi";
+import { PublishList, ShareWishlist } from "../../API/BaseApi";
+import LoadingButton from "../LoadingButton/LoadingButton";
 
 export default function CreateList({url,eventId}){
     const {id} = useParams();
@@ -13,11 +14,14 @@ export default function CreateList({url,eventId}){
     const [emailSent,setEmailSent] = useState(false);
     const [items, setItems] = useState([]);
     const {user,token} = useContext(UserContext);
+    const [loading, setLoading] = useState(false);
+    const [listLoading,setListLoading] = useState(false);
     console.log(location.state);
     useEffect(()=>{
         loadList();
     },[user])
     const loadList =async ()=>{
+        setListLoading(true);
         let data = await GetList(id,user.userId);
         let displayItems = data.map((item)=>{
             return <CreateListItem key={item.itemId} id={item.itemId} name={item.name}
@@ -26,10 +30,17 @@ export default function CreateList({url,eventId}){
             claimed={item.claimed} eventId={id} deleteCallback={handleDeleted}/>
         });
         setItems(displayItems);
+        setListLoading(false);
     }
-    const sendReminder = ()=>{
+    const publish = async ()=>{
+        setLoading(true);
+        await PublishList({eventId:id,userId:user.userId})
+        await sendReminder();
+        setLoading(false);
+    }
+    const sendReminder = async()=>{
         console.log(id,user.username);
-        ShareWishlist({eventId:id,username:user.username,name:location.state?.eventName});
+        await ShareWishlist({eventId:id,username:user.username,name:location.state?.eventName});
     }
     const handleAdd = ()=>{
         setItems([...items,<CreateListItem index={items.length+1} deleteCallback={handleDeleted} key={items.length+1} eventId={id} editing={true}/>])
@@ -57,14 +68,22 @@ export default function CreateList({url,eventId}){
                 </Row>
                 <Row className="headerRow">
                     <Col sm={10} className="headerCol">
-                    <Button onClick={sendReminder} className="fullWidthBtn">Share Wishlist</Button>
+                    <LoadingButton isloading={loading} onClick={publish} className="fullWidthBtn">Publish and Share</LoadingButton>
                     </Col>
 
                 </Row>
             </div>
+        {listLoading?                 <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                />:
         <div className="item-row">
             {items}
         </div>
+        }
         <hr></hr>
         <Button onClick={handleAdd}>Add A New Item</Button>
 

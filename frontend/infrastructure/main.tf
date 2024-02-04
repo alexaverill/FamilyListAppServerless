@@ -14,7 +14,7 @@ provider "aws" {
 }
 
 # Create S3 Bucket
-resource "aws_s3_bucket" "familylistapp-react-bucket" {
+resource "aws_s3_bucket" "familylistapp" {
   bucket = "familylistapp.com"
 
   tags = {
@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "familylistapp-react-bucket" {
 }
 # temporarily setup s3 website 
 resource "aws_s3_bucket_website_configuration" "temp-family-listApp" {
-  bucket = aws_s3_bucket.familylistapp-react-bucket.id
+  bucket = aws_s3_bucket.familylistapp.id
 
   index_document {
     suffix = "index.html"
@@ -34,14 +34,14 @@ resource "aws_s3_bucket_website_configuration" "temp-family-listApp" {
   }
 }
 resource "aws_s3_bucket_public_access_block" "allow-website-access" {
-  bucket = aws_s3_bucket.familylistapp-react-bucket.id
+  bucket = aws_s3_bucket.familylistapp.id
 
   block_public_acls       = false
   block_public_policy     = false
 }
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
-  bucket = aws_s3_bucket.familylistapp-react-bucket.id
+  bucket = aws_s3_bucket.familylistapp.id
 
   policy = <<POLICY
 {
@@ -52,7 +52,7 @@ resource "aws_s3_bucket_policy" "bucket_policy" {
       "Effect":"Allow",
       "Principal": "*",
       "Action":["s3:GetObject"],
-      "Resource":["arn:aws:s3:::${aws_s3_bucket.familylistapp-react-bucket.id}/*"]
+      "Resource":["arn:aws:s3:::${aws_s3_bucket.familylistapp.id}/*"]
     }
   ]
 }

@@ -43,7 +43,7 @@ export const handler: Handler = async (event, context) => {
            }
         });
         const hasItems = await docClient.send(checkListExistsCommand);
-        reciever.hasItems = hasItems.Items?.length>0;
+        reciever.hasItems = hasItems.Items?.length>0 && hasItems.Items?.some(item=>item.published);
       }
     }
     return {

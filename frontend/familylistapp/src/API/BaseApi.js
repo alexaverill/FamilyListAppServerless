@@ -56,3 +56,6 @@ export async function EventsByUser(){
 export async function ShareWishlist(eventObj){
   return await genericApiCall("/share-wishlist","POST",eventObj);
 }
+export async function PublishList(eventObj){
+  return await genericApiCall("/publish-list","POST",eventObj);
+}

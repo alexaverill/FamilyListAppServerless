@@ -107,6 +107,14 @@ module "share_wishlist" {
   lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
   handler_path = "shareList.handler"
 }
+module "publish_list" {
+  source = "./lambda_module"
+  source_path =  "../${path.module}/src/publishList/dist"
+  output_path = "${path.module}/publishList.zip"
+  lambda_name = "family-list-app-publish-list"
+  lambda_layer_arn = aws_lambda_layer_version.family_list_app_lambda_layer.arn
+  handler_path = "publishList.handler"
+}
 #Dynamo setup
 resource "aws_dynamodb_table" "lists-dynamodb-table" {
   name           = "Lists"
@@ -458,7 +466,20 @@ module "share_wishlist_api" {
   authorizer_id =aws_apigatewayv2_authorizer.auth.id
   gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
 }
-
+module "publish_list_api" {
+  permission_name = "publish-list"
+  source = "./api_endpoint_module"
+  gateway_id=aws_apigatewayv2_api.familylistapp_gateway.id
+  route="publish-list"
+  method="POST"
+  lambda_arn = module.publish_list.invoke_arn
+  lambda_function_name = module.publish_list.lambda_function_name
+  region = var.region
+  account_id = local.account_id
+  auth_type = "JWT"
+  authorizer_id =aws_apigatewayv2_authorizer.auth.id
+  gateway_execution_arn = aws_apigatewayv2_api.familylistapp_gateway.execution_arn
+}
 resource "aws_cloudwatch_log_group" "api_gw" {
   name = "/aws/api_gw/${aws_apigatewayv2_api.familylistapp_gateway.name}"
 
