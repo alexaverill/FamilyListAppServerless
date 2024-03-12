@@ -4,7 +4,7 @@ import './ListItem.css'
 import { UserContext } from "../UserContext/UserContext";
 import LoadingButton from "../LoadingButton/LoadingButton";
 import { ClaimItem, GetList, UnClaimItem } from "../../API/ListItemApi";
-export default function ListItem({id,name,cost,comments,itemClaimed,editable,editCallback,deleteCallback,claimCallback,unclaimCallback,eventId}){
+export default function ListItem({id,name,url,cost,comments,itemClaimed,editable,editCallback,deleteCallback,claimCallback,unclaimCallback,eventId}){
     const {user}=useContext(UserContext);
     const [isLoading, setLoading] = useState(false);
     const [claimed,setClaimed] = useState(itemClaimed);
@@ -70,7 +70,7 @@ export default function ListItem({id,name,cost,comments,itemClaimed,editable,edi
         <>
             <Row className={`listrow ${bgClass}`} >
                 <Col xs="8" md="4" lg="3">
-                    {name}
+                    <a href={url} alt={name} target="_blank">{name}</a>
                 </Col>
                 <Col xs="4" md="2" lg="1">
                     <strong>${cost}</strong>
