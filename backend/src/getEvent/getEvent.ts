@@ -3,7 +3,7 @@ import {Event} from "/opt/nodejs/Event"
 import { User } from "/opt/nodejs/User";
 import {ListItem} from "/opt/nodejs/ListItem"
 // ES6+ example
-import { DynamoDBClient, QueryCommand } from "@aws-sdk/client-dynamodb";
+import { AttributeValue, DynamoDBClient, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { unmarshall } from '@aws-sdk/util-dynamodb';
 const client = new DynamoDBClient({ region: "us-west-2" });
@@ -46,8 +46,9 @@ export const handler: Handler = async (event, context) => {
                     ':e': { S: `${event.eventId}` }
                 }
             });
-            const hasItems:any = await docClient.send(checkListExistsCommand);        
-            reciever.hasItems= hasItems.Items.some((item: { published: any; }) => item.published)
+            const hasItems:any = await docClient.send(checkListExistsCommand);     
+            let unmarshalledItems = hasItems?.Items.map((item: Record<string, AttributeValue>)=>unmarshall(item));
+            reciever.hasItems= unmarshalledItems.some((item: { published: any; }) => item.published)
             newUsers.push(reciever);
         }
         event.recieving = newUsers;
