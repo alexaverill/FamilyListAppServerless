@@ -14,18 +14,18 @@ export default function ViewList() {
     const {isLoading,setLoading}= useState(false);
     useEffect(() => {
         LoadList(id, userid);
-        console.log(UserContext);
     }, [id])
     const LoadList = async (eventId, userId) => {
         let data = await GetList(id, userid);
         if (data) {
+            console.log(data);
             setItems(data);
         }
     }
 
     const list = items?.map((item) => {
         return <ListItem id={item.itemId} name={item.name}
-            cost={item.price} url={item.url}
+            cost={item.cost} url={item.url}
             comments={item.comments}
             itemClaimed={item.claimed}  eventId={id}/>
     });
