@@ -31,26 +31,31 @@ export const handler: Handler = async (event, context) => {
       const items = response?.Items.map( (item) => {
         return unmarshall(item) as Event;
     });
+
     //check if we have lists 
-    for(let event of items){
-      for(let reciever of event.recieving){
-        const checkListExistsCommand = new QueryCommand({
-          TableName:"ListItems",
-          IndexName:"userIdIndex",
-          KeyConditionExpression:"eventId=:e and userId=:u",
-        ExpressionAttributeValues: {
-            ':u': {S:`${reciever.userId}`},
-            ':e': {S:`${event.eventId}`}
-           }
-        });
-        const hasItems = await docClient.send(checkListExistsCommand);
-        let items = (hasItems.Items as unknown) as ListItem[];
-        reciever.hasItems = hasItems.Items?.length>0 && items?.some(item=>item.published  ===true);
-      }
+    let updateItems = [];
+    for (let event of items) {
+        let newUsers = [];
+        for (let reciever of event.recieving) {
+            const checkListExistsCommand = new QueryCommand({
+                TableName: "ListItems",
+                IndexName: "userIdIndex",
+                KeyConditionExpression: "eventId=:e and userId=:u",
+                ExpressionAttributeValues: {
+                    ':u': { S: `${reciever.userId}` },
+                    ':e': { S: `${event.eventId}` }
+                }
+            });
+            const hasItems:any = await docClient.send(checkListExistsCommand);        
+            reciever.hasItems= hasItems.Items.some((item: { published: any; }) => item.published)
+            newUsers.push(reciever);
+        }
+        event.recieving = newUsers;
+        updateItems.push(event);
     }
     return {
         statusCode: 200,
-        body: JSON.stringify(items)
+        body: JSON.stringify(updateItems)
       }
     }catch(exception){
       console.log(exception);
