@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.16"
+      version = "~> 5.0"
     }
   }
 
@@ -53,7 +53,7 @@ resource "aws_lambda_function" "lambda_function" {
   s3_bucket =  aws_s3_bucket.lambda_bucket.id
   s3_key    = aws_s3_object.lambda-s3_object.key
 
-  runtime = "nodejs18.x"
+  runtime = "nodejs20.x"
   handler = "${var.handler_path}"
 
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
